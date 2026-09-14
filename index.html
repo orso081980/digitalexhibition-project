@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digital Exhibition — Migration Plan</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        ink: '#16181d', mute: '#6b7280', line: '#e7e7e9', panel: '#fafafa',
+        accent: '#ea580c', accentink: '#9a3412',
+      },
+      fontFamily: {
+        sans: ['Inter','ui-sans-serif','system-ui','-apple-system','Segoe UI','Roboto','sans-serif'],
+        serif: ['Newsreader','Georgia','ui-serif','serif'],
+        mono: ['ui-monospace','SFMono-Regular','Menlo','monospace'],
+      },
+    },
+  },
+}
+</script>
+<style>
+  body{ font-feature-settings:'cv05','ss01'; letter-spacing:-0.006em; }
+  ::selection{ background:#ea580c; color:#fff; }
+  details summary::-webkit-details-marker{ display:none; }
+  .nav-on{ color:#16181d; }
+  .nav-on::before{ opacity:1; transform:scaleY(1); }
+  .nav-lnk::before{ content:''; position:absolute; left:-13px; top:3px; bottom:3px; width:2px; background:#ea580c; opacity:0; transform:scaleY(.3); transition:.15s; }
+  @media print {
+    .no-print{ display:none !important; }
+    aside{ display:none !important; }
+    main{ max-width:none !important; }
+    details{ break-inside:avoid; }
+    body{ font-size:10.5pt; }
+    .shadow-card{ box-shadow:none !important; }
+  }
+</style>
+</head>
+<body class="bg-white font-sans text-[15px] leading-relaxed text-ink antialiased">
+
+<header class="no-print sticky top-0 z-30 border-b border-line bg-white/85 backdrop-blur">
+  <div class="mx-auto flex h-14 max-w-[1140px] items-center justify-between px-6">
+    <div class="flex items-baseline gap-2.5">
+      <span class="text-sm font-semibold tracking-tight">Digital Exhibition</span>
+      <span class="text-xs text-mute">Migration Plan</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="hidden items-center gap-2 sm:flex">
+        <div class="h-1.5 w-28 overflow-hidden rounded-full bg-line"><div id="hbar" class="h-full rounded-full bg-accent"></div></div>
+        <span id="hpct" class="tabular-nums text-xs font-medium text-mute"></span>
+      </div>
+      <button onclick="window.print()" class="rounded-md border border-line px-2.5 py-1 text-xs font-medium text-mute transition hover:border-mute hover:text-ink">Save PDF</button>
+    </div>
+  </div>
+</header>
+
+<div class="mx-auto grid max-w-[1140px] grid-cols-1 gap-x-14 px-6 lg:grid-cols-[210px_minmax(0,1fr)]">
+  <aside class="hidden lg:block">
+    <div class="sticky top-24 py-14">
+      <nav id="toc" class="space-y-1 border-l border-line pl-3 text-[13px]"></nav>
+      <dl id="docmeta" class="mt-8 space-y-2 border-t border-line pt-6 text-[12px] text-mute"></dl>
+    </div>
+  </aside>
+  <main id="app" class="min-w-0 py-14"></main>
+</div>
+
+<template id="err-tpl">
+  <div class="rounded-lg border border-red-200 bg-red-50 p-6 text-sm text-red-800">
+    <p class="font-semibold">Could not load <code>data.json</code>.</p>
+    <pre class="mt-3 overflow-x-auto rounded bg-white p-3 text-xs">cd project &amp;&amp; python3 -m http.server 8080
+# then open http://localhost:8080/</pre>
+  </div>
+</template>
+
+<script>
+const STATUS = {
+  'done':        ['Done','bg-emerald-50 text-emerald-700 ring-emerald-600/20'],
+  'in-progress': ['In progress','bg-blue-50 text-blue-700 ring-blue-600/20'],
+  'review':      ['Review','bg-amber-50 text-amber-700 ring-amber-600/20'],
+  'blocked':     ['Blocked','bg-red-50 text-red-700 ring-red-600/20'],
+  'todo':        ['To do','bg-neutral-100 text-neutral-500 ring-neutral-500/20'],
+};
+const PRIO = { P0:'text-red-600', P1:'text-amber-600', P2:'text-neutral-400' };
+const SEV  = { high:'bg-red-500', medium:'bg-amber-500', low:'bg-neutral-300' };
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+let DATA = null, filter = 'all';
+const allTasks = () => DATA.workstreams.flatMap(w => w.tasks);
+
+async function boot(){
+  const app = document.getElementById('app');
+  try {
+    const res = await fetch('data.json', { cache:'no-store' });
+    if(!res.ok) throw new Error(res.status);
+    DATA = await res.json();
+  } catch(e){
+    app.appendChild(document.getElementById('err-tpl').content.cloneNode(true));
+    return;
+  }
+  render();
+}
+
+const SECTIONS = () => [
+  ['summary','Summary'],
+  ...DATA.workstreams.map(w => [w.id, `${w.code}. ${w.name}`]),
+  ['schedule','Seven-day plan'],
+  ['plugins','Plugin audit'],
+  ['decisions','Open decisions'],
+  ['risks','Risks'],
+  ['architecture','Architecture'],
+];
+
+function h(tag, title, kicker){
+  return `<div class="mb-6 mt-16 first:mt-0">
+    ${kicker ? `<p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">${esc(kicker)}</p>` : ''}
+    <h2 class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">${esc(title)}</h2>
+  </div>`;
+}
+
+function render(){
+  const d = DATA, app = document.getElementById('app');
+  const tasks = allTasks();
+  const done = tasks.filter(t => t.status === 'done').length;
+  const inProg = tasks.filter(t => t.status === 'in-progress').length;
+  const decisionsOpen = (d.decisions||[]).filter(x => x.status === 'open').length;
+  const pct = Math.round(done / tasks.length * 100);
+  const statVal = {
+    workstreams: d.workstreams.length,
+    tasksTotal: tasks.length,
+    tasksDone: `${done}/${tasks.length}`,
+    decisionsOpen,
+  };
+
+  document.getElementById('hbar').style.width = pct + '%';
+  document.getElementById('hpct').textContent = pct + '%';
+
+  document.getElementById('toc').innerHTML = SECTIONS().map(([id,label]) =>
+    `<a href="#${id}" data-nav="${id}" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">${esc(label)}</a>`).join('');
+
+  document.getElementById('docmeta').innerHTML = [
+    ['Prepared by', esc(d.meta.author)],
+    ['Updated', esc(d.meta.updated)],
+    ['Timebox', `${esc(d.meta.timeboxDays)} working days`],
+    ['Status', `${pct}% complete`],
+  ].map(([k,v]) => `<div><dt class="text-[10px] uppercase tracking-wide text-neutral-400">${k}</dt><dd class="text-ink">${v}</dd></div>`).join('');
+
+  app.innerHTML = `
+    <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-mute">${esc(d.meta.client)}</p>
+    <h1 class="mt-3 max-w-3xl font-serif text-[40px] font-medium leading-[1.12] tracking-tight text-ink md:text-[46px]">${esc(d.meta.title)}</h1>
+    <p class="mt-3 text-lg text-mute">${esc(d.meta.subtitle)}</p>
+    <p class="mt-7 max-w-2xl text-[15px] leading-7 text-neutral-600">${esc(d.meta.summary)}</p>
+
+    <div class="mt-8 flex flex-wrap gap-x-8 gap-y-2 border-y border-line py-4 text-[13px] text-mute">
+      <span>Live · <a class="text-accentink hover:underline" href="${esc(d.meta.liveSite)}">${esc(d.meta.liveSite.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a></span>
+      <span>Front-end · <code class="text-neutral-600">${esc(d.meta.repoFrontend)}</code></span>
+      <span>Backend · <code class="text-neutral-600">${esc(d.meta.repoBackend)}</code></span>
+    </div>
+
+    ${h('div','Summary')}
+    <div id="summary" class="grid grid-cols-2 overflow-hidden rounded-xl border border-line shadow-card shadow-[0_1px_2px_rgba(0,0,0,0.04)] md:grid-cols-4">
+      ${d.stats.map((s,i) => `
+        <div class="border-line p-5 ${i%2?'border-l':''} ${i<2?'border-b md:border-b-0':''} ${i>0&&i%4!==0?'md:border-l':''}">
+          <div class="font-serif text-[28px] font-medium tabular-nums text-ink">${statVal[s.valueFrom] ?? '—'}</div>
+          <div class="mt-1 text-[11px] font-medium uppercase tracking-wide text-mute">${esc(s.label)}</div>
+        </div>`).join('')}
+    </div>
+    <div class="mt-5 flex items-center gap-4">
+      <div class="h-2 flex-1 overflow-hidden rounded-full bg-line">
+        <div class="h-full rounded-full bg-accent" style="width:${pct}%"></div>
+      </div>
+      <span class="shrink-0 text-[13px] text-mute">${done} done · ${inProg} in progress · ${tasks.length - done - inProg} to do</span>
+    </div>
+
+    ${h('div','Workstreams')}
+    <div class="no-print mb-5 flex flex-wrap gap-1.5" id="filters">
+      ${['all','todo','in-progress','review','blocked','done'].map(f => {
+        const label = f === 'all' ? 'All' : (STATUS[f]?.[0] ?? f);
+        return `<button data-f="${f}" class="rounded-full px-3 py-1 text-xs font-medium transition ${f===filter?'bg-ink text-white':'bg-panel text-mute ring-1 ring-inset ring-line hover:text-ink'}">${esc(label)}</button>`;
+      }).join('')}
+    </div>
+    <div class="space-y-3">${d.workstreams.map(renderWorkstream).join('')}</div>
+
+    ${h('div','Seven-day plan')}
+    <div id="schedule" class="overflow-hidden rounded-xl border border-line">
+      ${d.schedule.days.map((day,i) => `
+        <div class="flex flex-col gap-3 p-5 md:flex-row md:gap-8 ${i?'border-t border-line':''}">
+          <div class="flex items-start gap-3 md:w-56 md:shrink-0">
+            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent/10 font-serif text-sm font-medium text-accentink">${esc(day.day)}</span>
+            <div>
+              <div class="text-sm font-semibold leading-tight">${esc(day.label.replace(/^Day \d+ — /,''))}</div>
+              <p class="mt-0.5 text-[12px] text-mute">${esc(day.focus)}</p>
+            </div>
+          </div>
+          <ul class="flex-1 space-y-1.5 text-[13px] text-neutral-600">
+            ${day.items.map(it => `<li class="flex gap-2"><span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-neutral-300"></span><span>${esc(it)}</span></li>`).join('')}
+          </ul>
+        </div>`).join('')}
+    </div>
+
+    ${h('div','Plugin audit')}
+    <div id="plugins" class="overflow-x-auto rounded-xl border border-line">
+      <table class="min-w-full text-[13px]">
+        <thead>
+          <tr class="border-b border-line bg-panel text-left text-[11px] font-semibold uppercase tracking-wide text-mute">
+            ${d.pluginAudit.columns.map(c => `<th class="px-4 py-3 font-semibold">${esc(c)}</th>`).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${d.pluginAudit.rows.map((r,i) => `
+            <tr class="${i?'border-t border-line':''} align-top">
+              <td class="px-4 py-3 font-mono text-[12px] text-ink">${esc(r.plugin)}</td>
+              <td class="px-4 py-3 text-mute">${esc(r.purpose)}</td>
+              <td class="px-4 py-3"><span class="inline-block whitespace-nowrap text-[11px] font-bold uppercase tracking-wide ${decisionColor(r.decision)}">${esc(r.decision)}</span></td>
+              <td class="px-4 py-3 text-neutral-600">${esc(r.action)}</td>
+              <td class="px-4 py-3 text-[12px] text-neutral-400">${esc(r.note)}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    ${h('div','Open decisions')}
+    <ol id="decisions" class="grid gap-3 md:grid-cols-2">
+      ${d.decisions.map((x,i) => `
+        <li class="rounded-xl border border-line p-5">
+          <div class="flex items-baseline justify-between gap-3">
+            <span class="font-serif text-lg text-neutral-300">${String(i+1).padStart(2,'0')}</span>
+            <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${x.status==='open'?'bg-red-50 text-red-700':'bg-emerald-50 text-emerald-700'}">${esc(x.status)}</span>
+          </div>
+          <p class="mt-1 font-medium text-ink">${esc(x.question)}</p>
+          <p class="mt-2 text-[13px] leading-6 text-neutral-600"><span class="font-medium text-ink">Recommendation. </span>${esc(x.recommendation)}</p>
+          <p class="mt-2 text-[11px] uppercase tracking-wide text-neutral-400">Impacts ${x.impacts.map(esc).join(' · ')}</p>
+        </li>`).join('')}
+    </ol>
+
+    ${h('div','Risks')}
+    <ul id="risks" class="overflow-hidden rounded-xl border border-line">
+      ${d.risks.map((r,i) => `
+        <li class="flex gap-4 p-5 ${i?'border-t border-line':''}">
+          <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full ${SEV[r.severity]||SEV.low}" title="${esc(r.severity)}"></span>
+          <div>
+            <p class="font-medium text-ink">${esc(r.risk)} <span class="ml-1 text-[11px] font-semibold uppercase tracking-wide text-mute">${esc(r.severity)}</span></p>
+            <p class="mt-1 text-[13px] leading-6 text-neutral-600">${esc(r.mitigation)}</p>
+          </div>
+        </li>`).join('')}
+    </ul>
+
+    ${h('div','Architecture')}
+    <div id="architecture" class="grid gap-3">
+      <div class="grid gap-3 md:grid-cols-2">
+        <div class="rounded-xl border border-line p-5">
+          <p class="text-[11px] font-semibold uppercase tracking-wide text-mute">Before</p>
+          <p class="mt-1.5 text-[13px] leading-6 text-neutral-600">${esc(d.architecture.before)}</p>
+        </div>
+        <div class="rounded-xl border border-line bg-panel p-5">
+          <p class="text-[11px] font-semibold uppercase tracking-wide text-accentink">After</p>
+          <p class="mt-1.5 text-[13px] leading-6 text-neutral-600">${esc(d.architecture.after)}</p>
+        </div>
+      </div>
+      <div class="rounded-xl border border-line p-5">
+        <p class="mb-3 text-[11px] font-semibold uppercase tracking-wide text-mute">Request flow</p>
+        <div class="space-y-2">
+          ${d.architecture.edges.map(e => `
+            <div class="flex flex-wrap items-center gap-2 text-[12px]">
+              <span class="rounded-md border border-line bg-white px-2 py-1 font-medium text-ink">${esc(nodeLabel(e.from))}</span>
+              <span class="text-neutral-400">${esc(e.label)}</span>
+              <span class="text-neutral-300">→</span>
+              <span class="rounded-md border border-line bg-white px-2 py-1 font-medium text-ink">${esc(nodeLabel(e.to))}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <footer class="mt-20 border-t border-line pt-6 text-[12px] text-neutral-400">
+      Data-driven document — all content lives in <code>project/data.json</code>. ${esc(d.meta.client)} · ${esc(d.meta.updated)}
+    </footer>
+  `;
+
+  document.getElementById('filters').addEventListener('click', e => {
+    const b = e.target.closest('[data-f]');
+    if(!b) return;
+    filter = b.dataset.f;
+    render();
+  });
+  wireScrollSpy();
+}
+
+function wireScrollSpy(){
+  const links = [...document.querySelectorAll('[data-nav]')];
+  const byId = Object.fromEntries(links.map(l => [l.dataset.nav, l]));
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if(en.isIntersecting){
+        links.forEach(l => l.classList.remove('nav-on'));
+        byId[en.target.id]?.classList.add('nav-on');
+      }
+    });
+  }, { rootMargin: '-15% 0px -75% 0px' });
+  SECTIONS().forEach(([id]) => { const el = document.getElementById(id); if(el) io.observe(el); });
+}
+
+const nodeLabel = id => (DATA.architecture.nodes.find(n => n.id === id)||{}).label || id;
+
+function decisionColor(dec){
+  const s = dec.toUpperCase();
+  if(s.startsWith('KEEP')) return 'text-emerald-700';
+  if(s.startsWith('REMOVE')) return 'text-red-600';
+  if(s.startsWith('REPLACE') || s === 'RECONFIGURE') return 'text-amber-600';
+  if(s.startsWith('REVIEW') || s.startsWith('DONE')) return 'text-blue-600';
+  return 'text-neutral-400';
+}
+
+function renderWorkstream(w){
+  const shown = w.tasks.filter(t => filter === 'all' || t.status === filter);
+  const done = w.tasks.filter(t => t.status === 'done').length;
+  const pct = Math.round(done / w.tasks.length * 100);
+  const open = filter !== 'all';
+  return `
+    <details class="group overflow-hidden rounded-xl border border-line" ${open?'open':''} id="${w.id}">
+      <summary class="flex cursor-pointer list-none items-center gap-4 px-5 py-4 transition hover:bg-panel">
+        <span class="font-serif text-lg font-medium tabular-nums text-neutral-300">${esc(w.code)}</span>
+        <div class="min-w-0 flex-1">
+          <h3 class="font-semibold tracking-tight text-ink">${esc(w.name)}</h3>
+          <p class="mt-0.5 truncate text-[12px] text-mute">${esc(w.goal)}</p>
+        </div>
+        <div class="hidden w-40 shrink-0 items-center gap-2.5 sm:flex">
+          <div class="h-1.5 flex-1 overflow-hidden rounded-full bg-line"><div class="h-full rounded-full bg-accent" style="width:${pct}%"></div></div>
+          <span class="tabular-nums text-[12px] text-mute">${done}/${w.tasks.length}</span>
+        </div>
+        <svg class="h-4 w-4 shrink-0 text-neutral-400 transition group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg>
+      </summary>
+      <div class="border-t border-line px-5 py-4">
+        ${w.context ? `<p class="mb-4 rounded-lg bg-panel p-3 text-[12px] leading-5 text-mute">${esc(w.context)}</p>` : ''}
+        <div class="hidden grid-cols-[3rem_minmax(0,1fr)_5rem_7rem_2.5rem] gap-x-3 border-b border-line pb-2 text-[10px] font-semibold uppercase tracking-wide text-neutral-400 sm:grid">
+          <span>ID</span><span>Task</span><span>Priority</span><span>Status</span><span>Day</span>
+        </div>
+        <ul>
+          ${shown.length ? shown.map(renderTask).join('') : '<li class="py-4 text-sm text-neutral-400">No tasks match this filter.</li>'}
+        </ul>
+      </div>
+    </details>`;
+}
+
+function renderTask(t){
+  const [label, cls] = STATUS[t.status] || STATUS.todo;
+  return `
+    <li class="grid grid-cols-[3rem_minmax(0,1fr)] gap-x-3 gap-y-1.5 border-b border-line py-3 last:border-0 sm:grid-cols-[3rem_minmax(0,1fr)_5rem_7rem_2.5rem] sm:items-baseline">
+      <span class="font-mono text-[11px] text-neutral-400">${esc(t.id)}</span>
+      <div class="min-w-0">
+        <p class="font-medium text-ink">${esc(t.title)}</p>
+        ${t.notes ? `<p class="mt-0.5 text-[12px] leading-5 text-mute">${esc(t.notes)}</p>` : ''}
+        <p class="mt-1 flex gap-2 text-[11px] sm:hidden">
+          <span class="font-semibold ${PRIO[t.priority]||PRIO.P2}">${esc(t.priority)}</span>
+          <span class="rounded px-1.5 py-0.5 font-medium ring-1 ring-inset ${cls}">${esc(label)}</span>
+          <span class="text-neutral-400">Day ${esc(t.day)}</span>
+        </p>
+      </div>
+      <span class="hidden text-[12px] font-semibold sm:block ${PRIO[t.priority]||PRIO.P2}">${esc(t.priority)}</span>
+      <span class="hidden sm:block"><span class="rounded px-1.5 py-0.5 text-[11px] font-medium ring-1 ring-inset ${cls}">${esc(label)}</span></span>
+      <span class="hidden tabular-nums text-[12px] text-mute sm:block">${esc(t.day)}</span>
+    </li>`;
+}
+
+boot();
+</script>
+</body>
+</html>
