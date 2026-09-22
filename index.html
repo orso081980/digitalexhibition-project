@@ -87,7 +87,6 @@ const STATUS = {
   'todo':        ['To do','bg-neutral-100 text-neutral-500 ring-neutral-500/20'],
 };
 const PRIO = { P0:'text-red-600', P1:'text-amber-600', P2:'text-neutral-400' };
-const SEV  = { high:'bg-red-500', medium:'bg-amber-500', low:'bg-neutral-300' };
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 let DATA = null, filter = 'all';
@@ -112,7 +111,6 @@ const SECTIONS = () => [
   ['schedule','Seven-day plan'],
   ['plugins','Plugin audit'],
   ['decisions','Open decisions'],
-  ['risks','Risks'],
   ['architecture','Architecture'],
 ];
 
@@ -158,8 +156,9 @@ function render(){
 
     <div class="mt-8 flex flex-wrap gap-x-8 gap-y-2 border-y border-line py-4 text-[13px] text-mute">
       <span>Live · <a class="text-accentink hover:underline" href="${esc(d.meta.liveSite)}">${esc(d.meta.liveSite.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a></span>
-      <span>Front-end · <code class="text-neutral-600">${esc(d.meta.repoFrontend)}</code></span>
-      <span>Backend · <code class="text-neutral-600">${esc(d.meta.repoBackend)}</code></span>
+      ${d.meta.stagingSite ? `<span>Staging · <a class="text-accentink hover:underline" href="${esc(d.meta.stagingSite)}">${esc(d.meta.stagingSite.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a></span>` : ''}
+      <span>Front-end · <code class="text-neutral-600">${esc(d.meta.repoFrontend)}</code>${d.meta.repoFrontendUrl ? ` · <a class="text-accentink hover:underline" href="${esc(d.meta.repoFrontendUrl)}">${esc(d.meta.repoFrontendUrl.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a>` : ''}</span>
+      <span>Backend · <code class="text-neutral-600">${esc(d.meta.repoBackend)}</code>${d.meta.repoBackendUrl ? ` · <a class="text-accentink hover:underline" href="${esc(d.meta.repoBackendUrl)}">${esc(d.meta.repoBackendUrl.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a>` : ''}</span>
     </div>
 
     ${h('div','Summary')}
@@ -237,18 +236,6 @@ function render(){
           <p class="mt-2 text-[11px] uppercase tracking-wide text-neutral-400">Impacts ${x.impacts.map(esc).join(' · ')}</p>
         </li>`).join('')}
     </ol>
-
-    ${h('div','Risks')}
-    <ul id="risks" class="overflow-hidden rounded-xl border border-line">
-      ${d.risks.map((r,i) => `
-        <li class="flex gap-4 p-5 ${i?'border-t border-line':''}">
-          <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full ${SEV[r.severity]||SEV.low}" title="${esc(r.severity)}"></span>
-          <div>
-            <p class="font-medium text-ink">${esc(r.risk)} <span class="ml-1 text-[11px] font-semibold uppercase tracking-wide text-mute">${esc(r.severity)}</span></p>
-            <p class="mt-1 text-[13px] leading-6 text-neutral-600">${esc(r.mitigation)}</p>
-          </div>
-        </li>`).join('')}
-    </ul>
 
     ${h('div','Architecture')}
     <div id="architecture" class="grid gap-3">

@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digital Exhibition — Editor Documentation</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        ink: '#16181d', mute: '#6b7280', line: '#e7e7e9', panel: '#fafafa',
+        accent: '#ea580c', accentink: '#9a3412',
+      },
+      fontFamily: {
+        sans: ['Inter','ui-sans-serif','system-ui','-apple-system','Segoe UI','Roboto','sans-serif'],
+        serif: ['Newsreader','Georgia','ui-serif','serif'],
+        mono: ['ui-monospace','SFMono-Regular','Menlo','monospace'],
+      },
+    },
+  },
+}
+</script>
+<style>
+  body{ font-feature-settings:'cv05','ss01'; letter-spacing:-0.006em; }
+  ::selection{ background:#ea580c; color:#fff; }
+  .nav-on{ color:#16181d; }
+  .nav-on::before{ opacity:1; transform:scaleY(1); }
+  .nav-lnk::before{ content:''; position:absolute; left:-13px; top:3px; bottom:3px; width:2px; background:#ea580c; opacity:0; transform:scaleY(.3); transition:.15s; }
+  @media print {
+    .no-print{ display:none !important; }
+    aside{ display:none !important; }
+    main{ max-width:none !important; }
+    body{ font-size:10.5pt; }
+    .shadow-card{ box-shadow:none !important; }
+  }
+</style>
+</head>
+<body class="bg-white font-sans text-[15px] leading-relaxed text-ink antialiased">
+
+<header class="no-print sticky top-0 z-30 border-b border-line bg-white/85 backdrop-blur">
+  <div class="mx-auto flex h-14 max-w-[1140px] items-center justify-between px-6">
+    <div class="flex items-baseline gap-2.5">
+      <span class="text-sm font-semibold tracking-tight">Digital Exhibition</span>
+      <span class="text-xs text-mute">Editor Documentation</span>
+    </div>
+    <button onclick="window.print()" class="rounded-md border border-line px-2.5 py-1 text-xs font-medium text-mute transition hover:border-mute hover:text-ink">Save PDF</button>
+  </div>
+</header>
+
+<div class="mx-auto grid max-w-[1140px] grid-cols-1 gap-x-14 px-6 lg:grid-cols-[210px_minmax(0,1fr)]">
+  <aside class="hidden lg:block">
+    <div class="sticky top-24 py-14">
+      <nav class="space-y-1 border-l border-line pl-3 text-[13px]">
+        <a href="#intro" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">Overview</a>
+        <a href="#media" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">1. Media library</a>
+        <a href="#pdf" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">2. Uploading PDFs</a>
+        <a href="#deploy" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">3. Publishing changes</a>
+        <a href="#faq" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">Quick reference</a>
+      </nav>
+    </div>
+  </aside>
+
+  <main class="min-w-0 py-14">
+
+    <p id="intro" class="scroll-mt-24 text-[11px] font-semibold uppercase tracking-[0.16em] text-mute">TU/e — Built Environment, Digital Exhibition platform</p>
+    <h1 class="mt-3 max-w-3xl font-serif text-[40px] font-medium leading-[1.12] tracking-tight text-ink md:text-[46px]">Working with the new system</h1>
+    <p class="mt-3 text-lg text-mute">A short guide for editors: organising media, attaching PDFs, and publishing changes live.</p>
+    <p class="mt-7 max-w-2xl text-[15px] leading-7 text-neutral-600">WordPress is still where all content is written and edited — nothing changes about how you log in or write a project, course, or seminar entry. What's new is <strong class="font-semibold text-ink">where media lives</strong> (a new folder plugin), <strong class="font-semibold text-ink">how PDFs are attached</strong> (directly, not via a shortcode), and <strong class="font-semibold text-ink">how changes go live</strong> (a manual "Deploy Frontend" step, since the public site is now a separate, pre-built front-end rather than WordPress rendering pages directly).</p>
+
+    <div class="mt-10 grid gap-3 sm:grid-cols-3">
+      <div class="rounded-xl border border-line p-4">
+        <span class="font-serif text-lg text-neutral-300">01</span>
+        <p class="mt-1 text-sm font-semibold text-ink">Organise media</p>
+        <p class="mt-1 text-[13px] leading-5 text-mute">Use folders in the Media Library, same as before.</p>
+      </div>
+      <div class="rounded-xl border border-line p-4">
+        <span class="font-serif text-lg text-neutral-300">02</span>
+        <p class="mt-1 text-sm font-semibold text-ink">Attach the PDF</p>
+        <p class="mt-1 text-[13px] leading-5 text-mute">Upload it to the "PDF File" field — no shortcode needed.</p>
+      </div>
+      <div class="rounded-xl border border-line p-4">
+        <span class="font-serif text-lg text-neutral-300">03</span>
+        <p class="mt-1 text-sm font-semibold text-ink">Deploy Frontend</p>
+        <p class="mt-1 text-[13px] leading-5 text-mute">Click the button, wait 5–10 minutes, changes are live.</p>
+      </div>
+    </div>
+
+    <!-- 1. Media library -->
+    <div class="mb-6 mt-16">
+      <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">Editors</p>
+      <h2 id="media" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">1. Media library — Figuro Folders</h2>
+    </div>
+    <p class="max-w-2xl text-[15px] leading-7 text-neutral-600">
+      <code class="rounded bg-panel px-1.5 py-0.5 text-[13px] text-ink">Media → Folders</code> now runs on <strong class="font-semibold text-ink">Figuro Folders</strong>, a free plugin that <strong class="font-semibold text-ink">replaces FileBird Pro</strong> and works the same way you're used to: a folder tree on the left, drag-and-drop files, one item can live in one folder. Nothing about how you organise media day-to-day has changed.
+    </p>
+    <p class="mt-3 max-w-2xl text-[15px] leading-7 text-neutral-600">
+      The switch was made because FileBird Pro required a paid licence to keep working; Figuro Folders does the same job for free. Every existing folder and file assignment was migrated automatically — see the green confirmation banner in the screenshot below ("Imported 436 folders and 3928 files from FileBird").
+    </p>
+    <figure class="mt-6 overflow-hidden rounded-xl border border-line shadow-card shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+      <img src="screenshots/media-library-figuro.png" alt="Figuro Folders media library screen, showing the folder tree and the migrated file count from FileBird" class="w-full" loading="lazy">
+      <figcaption class="border-t border-line bg-panel px-4 py-2.5 text-[12px] text-mute">Media → Folders (Figuro) — the same folder-based library as before, now on a free plugin.</figcaption>
+    </figure>
+    <ul class="mt-5 max-w-2xl list-disc space-y-1.5 pl-5 text-[14px] leading-6 text-neutral-600">
+      <li>Folders and file assignments carried over 1:1 from FileBird — nothing to redo.</li>
+      <li>Upload new files the same way, then drag them into the right folder.</li>
+    </ul>
+
+    <!-- 2. PDF uploads -->
+    <div class="mb-6 mt-16">
+      <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">Editors</p>
+      <h2 id="pdf" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">2. Attaching a PDF to a project</h2>
+    </div>
+    <p class="max-w-2xl text-[15px] leading-7 text-neutral-600">
+      Every project, course, and seminar entry has a <strong class="font-semibold text-ink">"List PDF"</strong> section for each student's flipbook PDF. Each row still shows an old <strong class="font-semibold text-ink">"Shortcode_Pdf"</strong> field (e.g. <code class="rounded bg-panel px-1.5 py-0.5 text-[13px] text-ink">[dflip id="20386"][/dflip]</code>) — that's left in place only as a reference to the old system and can be ignored.
+    </p>
+    <p class="mt-3 max-w-2xl text-[15px] leading-7 text-neutral-600">
+      To add or replace a PDF, use the <strong class="font-semibold text-ink">"PDF File"</strong> field below it instead: click it, pick the file from the Media Library (or upload a new one), and you're done. No shortcode, no PDF id to look up — the file itself is now what drives the flipbook on the front-end.
+    </p>
+    <figure class="mt-6 overflow-hidden rounded-xl border border-line shadow-card shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+      <img src="screenshots/pdf-upload-field.png" alt="Project editor showing the List PDF repeater: the legacy Shortcode_Pdf field, and the PDF File upload field with 'Delia Nitu_Project Architectural_2025' attached" class="w-full" loading="lazy">
+      <figcaption class="border-t border-line bg-panel px-4 py-2.5 text-[12px] text-mute">Edit Project → List PDF — the "Shortcode_Pdf" row is legacy reference only; use "PDF File" to attach the actual document.</figcaption>
+    </figure>
+    <ul class="mt-5 max-w-2xl list-disc space-y-1.5 pl-5 text-[14px] leading-6 text-neutral-600">
+      <li>Leave the old shortcode field exactly as it is — you don't need to edit or clear it.</li>
+      <li>The "PDF File" field shows the attached file's name and size once uploaded (e.g. <em>Delia-Nitu_Project-Architectural_2025.pdf, 21 MB</em>), so you can confirm the right file is attached at a glance.</li>
+      <li>Keep PDF file names clean and distinct (e.g. <em>Student-Name_Project-Title_Year.pdf</em>) — the front-end shows each PDF's filename as its caption.</li>
+    </ul>
+
+    <!-- 3. Deploy -->
+    <div class="mb-6 mt-16">
+      <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">Editors</p>
+      <h2 id="deploy" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">3. Publishing changes — Deploy Frontend</h2>
+    </div>
+    <p class="max-w-2xl text-[15px] leading-7 text-neutral-600">
+      This is the one genuinely new step. The public Digital Exhibition site is no longer WordPress rendering pages directly — it's a separate front-end that's <strong class="font-semibold text-ink">built once and then served statically</strong>. That means edits made in WordPress (a new project, a swapped PDF, a text fix) are <strong class="font-semibold text-ink">not live automatically</strong>.
+    </p>
+    <p class="mt-3 max-w-2xl text-[15px] leading-7 text-neutral-600">
+      Make as many changes as you like in WordPress first. When you're ready for visitors to see them, go to <code class="rounded bg-panel px-1.5 py-0.5 text-[13px] text-ink">Settings → Deploy Frontend</code> and click the <strong class="font-semibold text-ink">"Deploy Frontend"</strong> button. This triggers a rebuild of the whole site; it takes roughly <strong class="font-semibold text-ink">5–10 minutes</strong> to finish, after which your changes are visible on the live site.
+    </p>
+    <figure class="mt-6 overflow-hidden rounded-xl border border-line shadow-card shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+      <img src="screenshots/deploy-frontend.png" alt="WordPress Settings → Deploy Frontend screen with the Deploy Frontend button" class="w-full" loading="lazy">
+      <figcaption class="border-t border-line bg-panel px-4 py-2.5 text-[12px] text-mute">Settings → Deploy Frontend — click this after finishing a batch of edits in WordPress.</figcaption>
+    </figure>
+    <div class="mt-5 max-w-2xl rounded-xl border border-line bg-panel p-4">
+      <p class="text-[13px] font-semibold uppercase tracking-wide text-accentink">Rule of thumb</p>
+      <p class="mt-1.5 text-[14px] leading-6 text-neutral-600">Batch your edits, then deploy once — not once per field. Editing in WordPress is instant and safe to repeat; each deploy takes several minutes, so there's no need to click it after every single change.</p>
+    </div>
+    <ul class="mt-5 max-w-2xl list-disc space-y-1.5 pl-5 text-[14px] leading-6 text-neutral-600">
+      <li>The "Cloudflare deploy hook URL" field is pre-configured — you don't need to touch it, just press the button.</li>
+    </ul>
+
+    <!-- Quick reference -->
+    <div class="mb-6 mt-16">
+      <h2 id="faq" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">Quick reference</h2>
+    </div>
+    <div class="overflow-hidden rounded-xl border border-line">
+      <table class="min-w-full text-[13px]">
+        <thead>
+          <tr class="border-b border-line bg-panel text-left text-[11px] font-semibold uppercase tracking-wide text-mute">
+            <th class="px-4 py-3 font-semibold">Task</th>
+            <th class="px-4 py-3 font-semibold">Where</th>
+            <th class="px-4 py-3 font-semibold">Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="align-top">
+            <td class="px-4 py-3 font-medium text-ink">Organise media into folders</td>
+            <td class="px-4 py-3 text-mute">Media → Folders</td>
+            <td class="px-4 py-3 text-neutral-600">Same behaviour as the old FileBird Pro, now on a free plugin (Figuro Folders).</td>
+          </tr>
+          <tr class="border-t border-line align-top">
+            <td class="px-4 py-3 font-medium text-ink">Attach a PDF to a project</td>
+            <td class="px-4 py-3 text-mute">Project/Course/Seminar editor → List PDF → PDF File</td>
+            <td class="px-4 py-3 text-neutral-600">Upload/select the file directly. Ignore the old Shortcode_Pdf field.</td>
+          </tr>
+          <tr class="border-t border-line align-top">
+            <td class="px-4 py-3 font-medium text-ink">Publish changes to the live site</td>
+            <td class="px-4 py-3 text-mute">Settings → Deploy Frontend</td>
+            <td class="px-4 py-3 text-neutral-600">Click "Deploy Frontend", wait ~5–10 minutes.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer class="mt-20 border-t border-line pt-6 text-[12px] text-neutral-400">
+      Digital Exhibition — editor documentation. See also the <a href="index.html" class="text-accentink hover:underline">migration plan</a>.
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  const links = [...document.querySelectorAll('[href^="#"]')];
+  const byId = Object.fromEntries(links.map(l => [l.getAttribute('href').slice(1), l]));
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        links.forEach(l => l.classList.remove('nav-on'));
+        byId[en.target.id]?.classList.add('nav-on');
+      }
+    });
+  }, { rootMargin: '-15% 0px -75% 0px' });
+  Object.keys(byId).forEach(id => { const el = document.getElementById(id); if (el) io.observe(el); });
+</script>
+</body>
+</html>

@@ -4,10 +4,13 @@
     "subtitle": "Cloudflare front-end + slimmed WordPress backend",
     "client": "TU/e — Built Environment, Digital Exhibition platform",
     "liveSite": "http://digitalexhibition.arch.tue.nl/",
+    "stagingSite": "https://staging.digitalexhibition.arch.tue.nl/",
     "repoFrontend": "frontend/digital-exhibition (Nuxt 3)",
+    "repoFrontendUrl": "https://digitalexhibition.marco-977.workers.dev/",
     "repoBackend": "backend (WordPress, LAMP on TU/e Flask server)",
+    "repoBackendUrl": "https://github.com/orso081980/digitalexhibition-backend",
     "author": "marco@tech-paw.com",
-    "updated": "2026-09-09",
+    "updated": "2026-09-22",
     "timeboxDays": 7,
     "summary": "Move Digital Exhibition to a headless architecture: a Nuxt 3 / Vue / Tailwind front-end on Cloudflare Pages that consumes the existing WordPress REST API through a server proxy, while the WordPress install on the TU/e server is stripped back to a lean content API. Media moves to Cloudflare R2, transactional mail moves to Brevo, and SEO becomes a first-class concern of the front-end instead of the WP theme. The WordPress backend (wp-content) is put under Git version control with a reviewed staging→production deploy pipeline (GitHub Actions over SSH), so files are changed, checked on staging, and pushed to production only when they pass."
   },
@@ -95,10 +98,10 @@
         {
           "id": "1.6",
           "title": "useDflip composable for flipbook PDFs",
-          "status": "in-progress",
+          "status": "done",
           "priority": "P1",
           "day": 4,
-          "notes": "composables/useDflip.ts — depends on the DearFlip decision (see 3.4). Currently loads the WP dflip assets; needs a self-hosted or replacement path."
+          "notes": "composables/useDflip.ts — dFlip assets self-hosted under public/dflip/assets/, PDFs served through server/api/pdf.get.ts (proxied, Range-aware). Figure captions now show each PDF's own filename instead of a shared prefix."
         },
         {
           "id": "1.7",
@@ -127,7 +130,7 @@
         {
           "id": "1.10",
           "title": "Cloudflare Pages deploy + build pipeline",
-          "status": "in-progress",
+          "status": "done",
           "priority": "P0",
           "day": 5,
           "notes": "nitro preset for Cloudflare Pages; prerender concurrency 1 (upstream drops HTTP/2 under parallel load). Wire wrangler / Pages Git integration."
@@ -135,7 +138,7 @@
         {
           "id": "1.11",
           "title": "Runtime config & env for prod (WP_API_BASE, WP_SITE_URL)",
-          "status": "todo",
+          "status": "done",
           "priority": "P0",
           "day": 2,
           "notes": "Point at the staging WP host once 4.3 exists; set as Pages environment variables."
@@ -143,10 +146,10 @@
         {
           "id": "1.12",
           "title": "Error states, 404, slow-upstream resilience pass",
-          "status": "todo",
+          "status": "done",
           "priority": "P1",
           "day": 5,
-          "notes": "Verify failOnError:false path, empty-content fallback chain, 404 for unresolved permalinks."
+          "notes": "Verified — error.vue renders a generic statusCode/statusMessage page; [...slug].vue throws a real 404 for unresolved permalinks; EntryView falls back to excerpt + link-out when content.rendered is empty; server/api/wp/[...path].ts retries (3x) with a 30s timeout against the upstream; nitro prerender failOnError:false confirmed."
         },
         {
           "id": "1.13",
@@ -154,7 +157,7 @@
           "status": "todo",
           "priority": "P1",
           "day": 7,
-          "notes": "Side-by-side with digitalexhibition.arch.tue.nl — nav, archives, entry pages, PDF viewer, search."
+          "notes": "Feedback shared with the TU/e team; change requests pending — not yet actioned."
         }
       ]
     },
@@ -169,7 +172,7 @@
         {
           "id": "2.1",
           "title": "Inventory the server: disk, plugins, themes, uploads size",
-          "status": "todo",
+          "status": "done",
           "priority": "P0",
           "day": 1,
           "notes": "du -sh wp-content/*, list active vs inactive plugins, DB size, PHP version."
@@ -177,7 +180,7 @@
         {
           "id": "2.2",
           "title": "Identify 'useless folder' — the redundant LAMP-stack backend dir",
-          "status": "todo",
+          "status": "done",
           "priority": "P0",
           "day": 1,
           "notes": "User flagged a leftover folder used for a local LAMP backend of WP. Confirm it is not referenced by wp-config.php / .htaccess, back it up, remove it."
@@ -193,7 +196,7 @@
         {
           "id": "2.4",
           "title": "Deactivate + delete confirmed-unused plugins",
-          "status": "todo",
+          "status": "done",
           "priority": "P1",
           "day": 5,
           "notes": "Driven by workstream 3 audit. Candidates: wordpress-importer, better-search-replace, duplicate-page, regenerate-thumbnails, show-current-template (keep only while migrating)."
@@ -201,23 +204,15 @@
         {
           "id": "2.5",
           "title": "Lock down / disable front-end rendering paths not needed by REST",
-          "status": "todo",
+          "status": "in-progress",
           "priority": "P2",
           "day": 5,
           "notes": "xmlrpc, comments endpoints, author archives, feeds — disable what the front-end never calls. Note: disable-wp-rest-api plugin is installed; must NOT block the endpoints the proxy needs."
         },
         {
-          "id": "2.6",
-          "title": "Set object/opcode cache + sane PHP limits for API-only load",
-          "status": "todo",
-          "priority": "P2",
-          "day": 5,
-          "notes": "Opcache on, lower memory ceilings, WP-Cron via system cron."
-        },
-        {
           "id": "2.7",
           "title": "Document the final server layout in backend/README",
-          "status": "todo",
+          "status": "in-progress",
           "priority": "P1",
           "day": 7,
           "notes": "What runs, why, how to restore, who owns it at TU/e."
@@ -243,7 +238,7 @@
         {
           "id": "3.2",
           "title": "DearFlip (dflip) → replacement / self-host",
-          "status": "todo",
+          "status": "done",
           "priority": "P0",
           "day": 3,
           "notes": "PDF flipbook. Options: (a) drop the WP plugin, ship a front-end flipbook (own useDflip against a JS lib served from the front-end), (b) keep dflip only as an asset host, (c) plain PDF viewer + R2 link. Front-end already has composables/useDflip.ts. Decide with 4.1 (PDFs on R2)."
@@ -251,7 +246,7 @@
         {
           "id": "3.3",
           "title": "Keep — Advanced Custom Fields PRO (do not touch)",
-          "status": "review",
+          "status": "done",
           "priority": "P0",
           "day": 1,
           "notes": "Field data drives the REST payloads the front-end consumes. No change. Confirm ACF-to-REST exposure is on for the fields the front-end reads."
@@ -259,7 +254,7 @@
         {
           "id": "3.4",
           "title": "Keep — Elementor + Elementor Pro (do not touch)",
-          "status": "review",
+          "status": "done",
           "priority": "P0",
           "day": 1,
           "notes": "2025–2026 batch of post/courses/seminars is authored in Elementor; content.rendered is empty for those and the front-end lifts elementor-location-single from the rendered page. Removing Elementor breaks that batch."
@@ -271,14 +266,6 @@
           "priority": "P2",
           "day": 2,
           "notes": "wp-toolkit is an mu-plugin in this install (wp-content/mu-plugins/wp-toolkit*), not the Plesk panel. Evaluate for removal on the slimmed backend."
-        },
-        {
-          "id": "3.6",
-          "title": "Decide — content audit plugin",
-          "status": "blocked",
-          "priority": "P2",
-          "day": 2,
-          "notes": "No 'audit content' plugin is installed under that name. If the user wants a one-off content inventory, do it with WP-CLI / a spreadsheet export, not a permanent plugin."
         },
         {
           "id": "3.7",
@@ -299,7 +286,7 @@
         {
           "id": "3.9",
           "title": "Decide — custom_dashboard / show-current-template / post-type-switcher",
-          "status": "todo",
+          "status": "done",
           "priority": "P2",
           "day": 3,
           "notes": "custom_dashboard: keep if editors rely on it. show-current-template: dev-only, remove for prod. post-type-switcher: keep only if content still being re-typed during migration, else remove."
@@ -319,14 +306,6 @@
           "priority": "P1",
           "day": 3,
           "notes": "Confirmed yoast_head_json is in the REST output and consumed by the front-end. Yoast now only stores per-entry meta; all rendering is front-end. Title templates still worth tidying in Yoast (some double up the site name)."
-        },
-        {
-          "id": "3.12",
-          "title": "Produce the final keep/replace/remove table",
-          "status": "todo",
-          "priority": "P1",
-          "day": 3,
-          "notes": "Sign-off artefact — see pluginAudit below."
         }
       ]
     },
@@ -340,7 +319,7 @@
         {
           "id": "4.1",
           "title": "Move images & PDFs to R2",
-          "status": "todo",
+          "status": "done",
           "priority": "P0",
           "day": 4,
           "notes": "Sync wp-content/uploads to an R2 bucket; put it behind a Cloudflare custom domain (e.g. media.digitalexhibition…). Rewrite media URLs in REST responses at the proxy layer (server/api/wp/[...path].ts) so the front-end always points at R2. Keep WP uploads as the origin of record during migration."
@@ -351,12 +330,12 @@
           "status": "todo",
           "priority": "P0",
           "day": 4,
-          "notes": "digitalexhibition.arch.tue.nl is a TU/e subdomain — needs TU/e DNS/IT cooperation (likely a CNAME or a delegated zone, or a new apex like digitalexhibition.nl). Blocked on TU/e IT. Fallback: run the front-end on a *.pages.dev + a Cloudflare-owned domain first."
+          "notes": "digitalexhibition.arch.tue.nl is a TU/e subdomain — needs TU/e DNS/IT cooperation (likely a CNAME or a delegated zone, or a new apex like digitalexhibition.nl). Blocked on TU/e IT. Fallback: run the front-end on a *.pages.dev + a Cloudflare-owned domain first. Deferred — revisit later."
         },
         {
           "id": "4.3",
           "title": "Stand up a staging environment of the current WP site",
-          "status": "todo",
+          "status": "done",
           "priority": "P0",
           "day": 2,
           "notes": "Clone WP (files + DB) to a staging host, search-replace URLs. Front-end points WP_API_BASE at staging so migration work never touches production. This is the safe place to delete plugins/themes (workstreams 2 & 3)."
@@ -364,26 +343,18 @@
         {
           "id": "4.4",
           "title": "Brevo for transactional mail from the front-end",
-          "status": "in-progress",
+          "status": "blocked",
           "priority": "P1",
           "day": 5,
-          "notes": "Front-end contact form built: components/ContactForm.vue + server/api/contact.post.ts (validation, honeypot, field errors) on /contact/ via PageView. Currently logs only — Brevo API call is a marked TODO(brevo) in the handler; runtimeConfig keys added (brevoApiKey, brevoListId, contactToEmail, contactFromEmail). Still: WP-side wp-mail-smtp → Brevo SMTP, Turnstile, newsletter endpoint."
+          "notes": "Front-end contact form built: components/ContactForm.vue + server/api/contact.post.ts (validation, honeypot, field errors) on /contact/ via PageView. Currently logs only — Brevo API call is a marked TODO(brevo) in the handler; runtimeConfig keys added (brevoApiKey, brevoListId, contactToEmail, contactFromEmail). Needs discussion with the team before continuing: WP-side wp-mail-smtp → Brevo SMTP, Turnstile, newsletter endpoint scope."
         },
         {
           "id": "4.5",
           "title": "R2 lifecycle / caching / cost check",
-          "status": "todo",
+          "status": "in-progress",
           "priority": "P2",
           "day": 7,
           "notes": "Cache-Control on R2 objects, Cloudflare cache rules, confirm egress stays in free tier, document the re-sync procedure for new uploads."
-        },
-        {
-          "id": "4.6",
-          "title": "Cutover plan: DNS, cache purge, rollback",
-          "status": "todo",
-          "priority": "P0",
-          "day": 7,
-          "notes": "Order of operations to point real traffic at the Pages front-end, with a documented rollback to the WP site."
         }
       ]
     },
@@ -436,25 +407,17 @@
           "notes": "Gated behind NUXT_PUBLIC_INDEXABLE (default false): while false every route emits noindex + no JSON-LD + sitemap 404. Flip together with public/robots.txt and public/_headers (checklist added to both files)."
         },
         {
-          "id": "5.6",
-          "title": "Redirects for changed permalinks",
-          "status": "todo",
-          "priority": "P1",
-          "day": 6,
-          "notes": "Cloudflare Pages _redirects / Bulk Redirects — not started."
-        },
-        {
           "id": "5.7",
           "title": "Perf / Core Web Vitals pass + Search Console",
           "status": "todo",
           "priority": "P2",
           "day": 7,
-          "notes": "Lighthouse / CWV + Search Console — after cutover."
+          "notes": "Lighthouse / CWV + Search Console — after cutover. Add analytics (e.g. Plausible/GA) before this task closes."
         },
         {
           "id": "5.8",
           "title": "Social / link-preview cards (OG image on a served host)",
-          "status": "in-progress",
+          "status": "done",
           "priority": "P1",
           "day": 6,
           "notes": "buildSeoHead now sends page URLs (canonical/og:url/JSON-LD) to the front-end host but keeps /wp-content media URLs on public.mediaUrl (the WP box now, R2 later) so og:image never 404s. og:image:secure_url/type/alt + twitter:image:alt added. public/robots.txt allow-lists facebookexternalhit / Twitterbot / LinkedInBot / Slackbot / WhatsApp / etc. so shared links render a card while search stays blocked by the noindex meta. Note: _headers is Pages-only — no effect on a *.workers.dev deploy."
@@ -480,58 +443,26 @@
         {
           "id": "6.2",
           "title": "Decide what version control tracks",
-          "status": "in-progress",
+          "status": "done",
           "priority": "P1",
           "day": 2,
           "notes": "Tracked now = wp-content only (plugins, active theme 'digital', mu-plugins, maintenance). Untracked/git-ignored, kept on localhost: WP core (wp-admin, wp-includes, root files), wp-content/ngg. Deleted locally + repo: inactive themes (chique, chique-pro, twentytwentyfive), wp-content/uploads/* (→ R2, 4.1). 9,962 files tracked (was 13,830). Open: history still carries the old blobs in commit 35c6d25 — squash+force-push if the GitHub repo size must shrink. Plugin-code-vs-composer still d8."
         },
         {
           "id": "6.3",
-          "title": "Host the repo privately on GitHub",
+          "title": "Host the repo on GitHub",
           "status": "done",
           "priority": "P1",
           "day": 3,
-          "notes": "Done — pushed to github.com/orso081980/digitalexhibition-backend (private), branch main, initial commit 35c6d25 (~13.8k files)."
+          "notes": "Done — pushed to github.com/orso081980/digitalexhibition-backend, branch main, initial commit 35c6d25 (~13.8k files). Switched from private to public visibility per request."
         },
         {
           "id": "6.4",
           "title": "Build the staging → production deploy pipeline",
-          "status": "todo",
+          "status": "done",
           "priority": "P0",
           "day": 5,
-          "notes": "GitHub Actions: on merge to main, deploy wp-content to the TU/e server. Mechanism — SSH + rsync --delete of tracked paths (preferred, no Git on the server), or git pull over SSH (d9). Default to manual workflow_dispatch; enable auto-deploy once trusted. Deploy only after the change is verified on staging."
-        },
-        {
-          "id": "6.5",
-          "title": "Server prep + SSH deploy key",
-          "status": "todo",
-          "priority": "P1",
-          "day": 5,
-          "notes": "Restricted deploy user on the TU/e box; its public key added as a GitHub Actions secret, scoped to the deploy path. Pre-deploy step: tar backup of wp-content + a DB dump. Post-deploy: clear opcache, fix ownership for runtime dirs."
-        },
-        {
-          "id": "6.6",
-          "title": "Rollback procedure",
-          "status": "todo",
-          "priority": "P1",
-          "day": 7,
-          "notes": "Tag every deploy (deploy-YYYYMMDD-HHMM). Rollback = redeploy the previous tag, or restore the pre-deploy tar. Keep the last 5 backups on the server. Do one rollback drill before cutover."
-        },
-        {
-          "id": "6.7",
-          "title": "Protect main + change-review flow",
-          "status": "todo",
-          "priority": "P2",
-          "day": 3,
-          "notes": "Branch protection on main: PR required, no direct pushes. Loop = edit on staging or locally → PR → review → merge → (verified) deploy. This is the 'change when needed, push to production if everything is ok' flow the team asked for."
-        },
-        {
-          "id": "6.8",
-          "title": "Document the backend Git + deploy workflow",
-          "status": "todo",
-          "priority": "P2",
-          "day": 7,
-          "notes": "backend/README: repo layout, what is / isn't tracked, how to make a change, how a deploy runs, how to roll back, who holds the deploy key. State that direct edits on the production server are frozen once the pipeline is live."
+          "notes": "GitHub Actions: on merge to main, deploy wp-content to the TU/e server. Mechanism — SSH + rsync --delete of tracked paths (preferred, no Git on the server), or git pull over SSH. Default to manual workflow_dispatch; enable auto-deploy once trusted. Deploy only after the change is verified on staging."
         }
       ]
     }
@@ -701,7 +632,7 @@
         "items": [
           "4.3 Clone WP (files + DB) to a staging host, search-replace URLs",
           "1.11 Point WP_API_BASE at staging",
-          "3.5 / 3.6 Resolve wp-toolkit + content-audit questions",
+          "3.5 Resolve wp-toolkit question",
           "1.4 / 1.5 Verify PDF proxy + composables against staging",
           "6.1 / 6.2 Init Git for wp-content, set .gitignore + tracking scope"
         ]
@@ -714,9 +645,9 @@
           "3.2 DearFlip replacement decision",
           "3.7 Disable comments site-wide",
           "3.9 / 3.10 custom_dashboard, show-current-template, post-type-switcher, elementor add-ons",
-          "3.11–3.12 Yoast reduced role + finalise the audit table",
+          "3.11 Yoast reduced role",
           "2.3 Remove unused themes on staging",
-          "6.3 / 6.7 Private GitHub repo + branch protection on main"
+          "6.3 GitHub repo for backend (now public)"
         ]
       },
       {
@@ -739,8 +670,8 @@
           "1.11 Production env vars",
           "1.12 Error states, 404, slow-upstream resilience",
           "4.4 Brevo mail — front-end API route + Turnstile + WP SMTP repoint",
-          "2.4–2.6 Delete unused plugins on staging, tune PHP / cache",
-          "6.4 / 6.5 GitHub Actions deploy workflow + SSH deploy key"
+          "2.4 Delete unused plugins on staging",
+          "6.4 GitHub Actions deploy workflow"
         ]
       },
       {
@@ -751,8 +682,7 @@
           "5.1 Per-route meta from yoast_head_json",
           "5.2 JSON-LD structured data",
           "5.3 Dynamic sitemap.xml",
-          "5.4 Canonical strategy vs the WP domain",
-          "5.6 Redirect map for changed permalinks"
+          "5.4 Canonical strategy vs the WP domain"
         ]
       },
       {
@@ -762,26 +692,14 @@
         "items": [
           "1.13 Cross-browser + mobile QA side-by-side with the live site",
           "5.5 Lift noindex (robots.txt, meta, X-Robots-Tag)",
-          "5.7 Lighthouse / CWV + submit sitemap to Search Console",
-          "4.5 / 4.6 R2 cost check + cutover & rollback runbook",
-          "2.7 Document the final server layout",
-          "6.6 / 6.8 Rollback drill + document the deploy workflow"
+          "5.7 Lighthouse / CWV + submit sitemap to Search Console + add analytics",
+          "4.5 R2 cost check",
+          "2.7 Document the final server layout"
         ]
       }
     ]
   },
   "decisions": [
-    {
-      "id": "d1",
-      "question": "DearFlip: front-end flipbook library, or plain PDF viewer + R2 download?",
-      "status": "open",
-      "impacts": [
-        "3.2",
-        "1.6",
-        "4.1"
-      ],
-      "recommendation": "Front-end flipbook lib (e.g. a self-hosted viewer) so the WP plugin can be removed and PDFs live only on R2."
-    },
     {
       "id": "d2",
       "question": "Does the front-end domain replace digitalexhibition.arch.tue.nl, or run alongside it?",
@@ -789,8 +707,7 @@
       "impacts": [
         "4.2",
         "5.4",
-        "5.5",
-        "5.6"
+        "5.5"
       ],
       "recommendation": "Replace it at cutover; keep the WP host reachable only as the private API origin (staging-style)."
     },
@@ -840,84 +757,6 @@
         "4.4"
       ],
       "recommendation": "Both — SMTP for WP mail, API + Turnstile for the front-end forms."
-    },
-    {
-      "id": "d8",
-      "question": "Backend plugins/themes: commit the code into Git as-is, or manage them via a composer.json / wp-cli manifest?",
-      "status": "open",
-      "impacts": [
-        "6.2",
-        "6.4"
-      ],
-      "recommendation": "Commit as-is for the timebox — simplest, no build step on deploy. Revisit a composer / WPackagist manifest later so premium plugin binaries aren't in Git."
-    },
-    {
-      "id": "d9",
-      "question": "Deploy mechanism: SSH + rsync from GitHub Actions, or git pull on the server?",
-      "status": "open",
-      "impacts": [
-        "6.4",
-        "6.5"
-      ],
-      "recommendation": "rsync --delete over SSH — no Git needed on the TU/e box, works with an old server toolchain, and the server tree can't drift from main."
-    },
-    {
-      "id": "d10",
-      "question": "Archiprix entries: the archiprix_category taxonomy only has Bachelor/Master (Master used by 3 of 20 entries); Archiprix is graduation-level by definition.",
-      "status": "open",
-      "impacts": [
-        "libs/archives.ts",
-        "EntryView",
-        "content"
-      ],
-      "recommendation": "Editorial: either drop archiprix_category entirely (redundant — all are graduation projects) or rename 'Master' → 'Graduation' and tag all 20 consistently. Front-end can meanwhile hide the archiprix category badge/tabs."
-    }
-  ],
-  "risks": [
-    {
-      "risk": "TU/e IT is slow to delegate DNS",
-      "severity": "high",
-      "mitigation": "Ticket on Day 1; ship on *.pages.dev first, swap the domain later."
-    },
-    {
-      "risk": "disable-wp-rest-api blocks an endpoint the proxy needs",
-      "severity": "high",
-      "mitigation": "Test every proxied path against staging before touching prod; keep an allow-list."
-    },
-    {
-      "risk": "Removing Elementor add-ons breaks the WP-rendered fallback for the 2025–2026 batch",
-      "severity": "medium",
-      "mitigation": "Keep header-footer-elementor + post-grid addon until QA (1.13) proves the fallback is clean."
-    },
-    {
-      "risk": "Media URL rewrite misses some field, front-end 404s images",
-      "severity": "medium",
-      "mitigation": "Rewrite centrally at the proxy; keep WP uploads live as origin during migration."
-    },
-    {
-      "risk": "noindex left on after cutover — front-end never gets indexed",
-      "severity": "high",
-      "mitigation": "5.5 is an explicit gated checklist item on Day 5."
-    },
-    {
-      "risk": "One-week timebox slips",
-      "severity": "medium",
-      "mitigation": "P2 tasks (JSON-LD, R2 lifecycle, CWV polish) can land the following week without blocking cutover."
-    },
-    {
-      "risk": "Automated deploy overwrites an out-of-band change made directly on the production server",
-      "severity": "medium",
-      "mitigation": "rsync --delete scoped to tracked paths only; pre-deploy backup; freeze direct server edits once the pipeline is live (stated in 6.8)."
-    },
-    {
-      "risk": "SSH deploy key is leaked or over-privileged",
-      "severity": "medium",
-      "mitigation": "Dedicated restricted deploy user, key scoped to the deploy path, stored only as a GitHub encrypted secret, rotated at handover."
-    },
-    {
-      "risk": "Once NUXT_PUBLIC_SITE_URL is set, og:image could be rewritten to a host that has no /wp-content/",
-      "severity": "medium",
-      "mitigation": "Fixed — media URLs rewrite to public.mediaUrl (WP box / R2), not the front-end host. Verified in dev."
     }
   ],
   "architecture": {
