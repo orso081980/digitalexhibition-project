@@ -94,6 +94,7 @@ tailwind.config = {
     <div class="mb-6 mt-16">
       <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">Editors</p>
       <h2 id="media" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">1. Media library — Figuro Folders</h2>
+      <a href="https://staging.digitalexhibition.arch.tue.nl/wp-admin/upload.php?page=figuro-media" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-block text-[13px] font-medium text-accentink hover:underline">Media → Folders</a>
     </div>
     <p class="max-w-2xl text-[15px] leading-7 text-neutral-600">
       <code class="rounded bg-panel px-1.5 py-0.5 text-[13px] text-ink">Media → Folders</code> now runs on <strong class="font-semibold text-ink">Figuro Folders</strong>, a free plugin that <strong class="font-semibold text-ink">replaces FileBird Pro</strong> and works the same way you're used to: a folder tree on the left, drag-and-drop files, one item can live in one folder. Nothing about how you organise media day-to-day has changed.
@@ -114,6 +115,7 @@ tailwind.config = {
     <div class="mb-6 mt-16">
       <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">Editors</p>
       <h2 id="pdf" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">2. Attaching a PDF to a project</h2>
+      <a href="https://staging.digitalexhibition.arch.tue.nl/wp-admin/post.php?post=20019&action=edit" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-block text-[13px] font-medium text-accentink hover:underline">Project/Course/Seminar editor → List PDF → PDF File</a>
     </div>
     <p class="max-w-2xl text-[15px] leading-7 text-neutral-600">
       Every project, course, and seminar entry has a <strong class="font-semibold text-ink">"List PDF"</strong> section for each student's flipbook PDF. Each row still shows an old <strong class="font-semibold text-ink">"Shortcode_Pdf"</strong> field (e.g. <code class="rounded bg-panel px-1.5 py-0.5 text-[13px] text-ink">[dflip id="20386"][/dflip]</code>) — that's left in place only as a reference to the old system and can be ignored.
@@ -135,6 +137,7 @@ tailwind.config = {
     <div class="mb-6 mt-16">
       <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">Editors</p>
       <h2 id="deploy" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">3. Publishing changes — Deploy Frontend</h2>
+      <a href="https://staging.digitalexhibition.arch.tue.nl/wp-admin/options-general.php?page=cfdt-settings" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-block text-[13px] font-medium text-accentink hover:underline">Settings → Deploy Frontend</a>
     </div>
     <p class="max-w-2xl text-[15px] leading-7 text-neutral-600">
       This is the one genuinely new step. The public Digital Exhibition site is no longer WordPress rendering pages directly — it's a separate front-end that's <strong class="font-semibold text-ink">built once and then served statically</strong>. That means edits made in WordPress (a new project, a swapped PDF, a text fix) are <strong class="font-semibold text-ink">not live automatically</strong>.
@@ -170,17 +173,17 @@ tailwind.config = {
         <tbody>
           <tr class="align-top">
             <td class="px-4 py-3 font-medium text-ink">Organise media into folders</td>
-            <td class="px-4 py-3 text-mute">Media → Folders</td>
+            <td class="px-4 py-3 text-mute"><a href="https://staging.digitalexhibition.arch.tue.nl/wp-admin/upload.php?page=figuro-media" target="_blank" rel="noopener noreferrer" class="text-accentink hover:underline">Media → Folders</a></td>
             <td class="px-4 py-3 text-neutral-600">Same behaviour as the old FileBird Pro, now on a free plugin (Figuro Folders).</td>
           </tr>
           <tr class="border-t border-line align-top">
             <td class="px-4 py-3 font-medium text-ink">Attach a PDF to a project</td>
-            <td class="px-4 py-3 text-mute">Project/Course/Seminar editor → List PDF → PDF File</td>
+            <td class="px-4 py-3 text-mute"><a href="https://staging.digitalexhibition.arch.tue.nl/wp-admin/post.php?post=20019&action=edit" target="_blank" rel="noopener noreferrer" class="text-accentink hover:underline">Project/Course/Seminar editor</a> → List PDF → PDF File</td>
             <td class="px-4 py-3 text-neutral-600">Upload/select the file directly. Ignore the old Shortcode_Pdf field.</td>
           </tr>
           <tr class="border-t border-line align-top">
             <td class="px-4 py-3 font-medium text-ink">Publish changes to the live site</td>
-            <td class="px-4 py-3 text-mute">Settings → Deploy Frontend</td>
+            <td class="px-4 py-3 text-mute"><a href="https://staging.digitalexhibition.arch.tue.nl/wp-admin/options-general.php?page=cfdt-settings" target="_blank" rel="noopener noreferrer" class="text-accentink hover:underline">Settings → Deploy Frontend</a></td>
             <td class="px-4 py-3 text-neutral-600">Click "Deploy Frontend", wait ~5–10 minutes.</td>
           </tr>
         </tbody>
