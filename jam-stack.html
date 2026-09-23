@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digital Exhibition — WordPress → Jamstack Comparison</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        ink: '#16181d', mute: '#6b7280', line: '#e7e7e9', panel: '#fafafa',
+        accent: '#ea580c', accentink: '#9a3412',
+        wp: '#5f6b7a', wpbg: '#f3f4f6',
+        nx: '#0f766e', nxbg: '#ecfdf5',
+      },
+      fontFamily: {
+        sans: ['Inter','ui-sans-serif','system-ui','-apple-system','Segoe UI','Roboto','sans-serif'],
+        serif: ['Newsreader','Georgia','ui-serif','serif'],
+        mono: ['ui-monospace','SFMono-Regular','Menlo','monospace'],
+      },
+    },
+  },
+}
+</script>
+<style>
+  body{ font-feature-settings:'cv05','ss01'; letter-spacing:-0.006em; }
+  ::selection{ background:#ea580c; color:#fff; }
+  .nav-on{ color:#16181d; }
+  .nav-on::before{ opacity:1; transform:scaleY(1); }
+  .nav-lnk::before{ content:''; position:absolute; left:-13px; top:3px; bottom:3px; width:2px; background:#ea580c; opacity:0; transform:scaleY(.3); transition:.15s; }
+  .shot{ max-height:640px; object-fit:cover; object-position:top; }
+  .shot-full{ max-height:none; object-fit:contain; }
+  @media print {
+    .no-print{ display:none !important; }
+    aside{ display:none !important; }
+    main{ max-width:none !important; }
+  }
+</style>
+</head>
+<body class="bg-white font-sans text-[15px] leading-relaxed text-ink antialiased">
+
+<header class="no-print sticky top-0 z-30 border-b border-line bg-white/85 backdrop-blur">
+  <div class="mx-auto flex h-14 max-w-[1400px] items-center justify-between px-6">
+    <div class="flex items-baseline gap-2.5">
+      <span class="text-sm font-semibold tracking-tight">Digital Exhibition</span>
+      <span class="text-xs text-mute">WordPress → Jamstack — Visual Comparison</span>
+    </div>
+    <button onclick="window.print()" class="rounded-md border border-line px-2.5 py-1 text-xs font-medium text-mute transition hover:border-mute hover:text-ink">Save PDF</button>
+  </div>
+</header>
+
+<div class="mx-auto grid max-w-[1400px] grid-cols-1 gap-x-14 px-6 lg:grid-cols-[210px_minmax(0,1fr)]">
+  <aside class="hidden lg:block">
+    <div class="sticky top-24 py-14">
+      <nav class="space-y-1 border-l border-line pl-3 text-[13px]">
+        <a href="#intro" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">Overview</a>
+        <a href="#home" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">1. Home / News</a>
+        <a href="#mobile-nav" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">2. Mobile navigation</a>
+        <a href="#single" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">3. Single entry layout</a>
+        <a href="#pdf" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">4. PDF viewer</a>
+        <a href="#archive" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">5. Course archive & filters</a>
+        <a href="#multi-project" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">6. Multi-project studio layout</a>
+        <a href="#summary" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">Summary table</a>
+      </nav>
+    </div>
+  </aside>
+
+  <main class="min-w-0 py-14">
+
+    <p id="intro" class="scroll-mt-24 text-[11px] font-semibold uppercase tracking-[0.16em] text-mute">TU/e — Built Environment, Digital Exhibition platform</p>
+    <h1 class="mt-3 max-w-3xl font-serif text-[40px] font-medium leading-[1.12] tracking-tight text-ink md:text-[46px]">What changes for visitors</h1>
+    <p class="mt-3 text-lg text-mute">A side-by-side look at the current WordPress site and its Jamstack rebuild, on the same URLs.</p>
+    <p class="mt-7 max-w-3xl text-[15px] leading-7 text-neutral-600">Both sites below share the same routes — only the domain differs. Screenshots were taken at a common desktop size (1440px) and a common mobile size (iPhone-class, 390px), on the actual live pages, so what you see here is the real rendered layout on both sides, not a mockup.</p>
+
+    <div class="mt-8 flex flex-wrap gap-3">
+      <div class="flex items-center gap-2 rounded-lg border border-line px-3 py-2">
+        <span class="h-2.5 w-2.5 rounded-full" style="background:#5f6b7a"></span>
+        <span class="text-[13px] font-medium text-ink">Current — WordPress</span>
+        <a href="https://digitalexhibition.arch.tue.nl/" target="_blank" rel="noopener noreferrer" class="text-[12px] text-mute hover:text-accentink hover:underline">digitalexhibition.arch.tue.nl ↗</a>
+      </div>
+      <div class="flex items-center gap-2 rounded-lg border border-line px-3 py-2">
+        <span class="h-2.5 w-2.5 rounded-full" style="background:#0f766e"></span>
+        <span class="text-[13px] font-medium text-ink">New — Jamstack</span>
+        <a href="https://digitalexhibition.marco-977.workers.dev/" target="_blank" rel="noopener noreferrer" class="text-[12px] text-mute hover:text-accentink hover:underline">digitalexhibition.marco-977.workers.dev ↗</a>
+      </div>
+    </div>
+
+    <!-- 1. Home / News -->
+    <div class="mb-6 mt-16">
+      <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">/ and /news/</p>
+      <h2 id="home" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">1. Home &amp; News (same page)</h2>
+    </div>
+    <ul class="max-w-2xl list-disc space-y-1.5 pl-5 text-[14px] leading-6 text-neutral-600">
+      <li>Less empty space above the menu, so the nav no longer gets visually flattened when the viewport is shorter than ~600px tall.</li>
+      <li>The search icon and its expanding form now animate smoothly instead of snapping open.</li>
+      <li>The hero title is slightly smaller, so it doesn't dominate the fold as much.</li>
+      <li>Every post card in the grid is now the same height — no more ragged rows.</li>
+      <li>Pagination was added to the bottom of the feed: each page shows the hero plus <strong class="font-semibold text-ink">exactly 9 posts</strong>, instead of one long unpaginated list.</li>
+    </ul>
+
+    <div class="mt-6 grid gap-4 sm:grid-cols-2">
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-wpbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-wp">Current — WordPress</span>
+          <span class="text-[11px] text-mute">Desktop, full page</span>
+        </div>
+        <div class="overflow-y-auto" style="max-height:640px">
+          <img src="screenshots/jam-stack/wp__home__desktop.png" alt="WordPress home page, desktop, full length — unpaginated grid, larger hero title" class="w-full" loading="lazy">
+        </div>
+      </figure>
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-nxbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-nx">New — Jamstack</span>
+          <span class="text-[11px] text-mute">Desktop, full page</span>
+        </div>
+        <div class="overflow-y-auto" style="max-height:640px">
+          <img src="screenshots/jam-stack/nuxt__home__desktop.png" alt="Jamstack home page, desktop, full length — hero plus 9 evenly-sized post cards, pagination below" class="w-full" loading="lazy">
+        </div>
+      </figure>
+    </div>
+    <p class="mt-2 text-[12px] text-mute">Scroll inside either panel — both are full-page captures. Note the WordPress grid keeps listing posts indefinitely; the Jamstack version stops at 9 + hero and paginates.</p>
+
+    <div class="mt-8 grid gap-4 sm:grid-cols-2">
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-wpbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-wp">Current — WordPress</span>
+          <span class="text-[11px] text-mute">Mobile, full page</span>
+        </div>
+        <div class="overflow-y-auto" style="max-height:640px">
+          <img src="screenshots/jam-stack/wp__home__mobile.png" alt="WordPress home page, mobile, full length" class="w-full" loading="lazy">
+        </div>
+      </figure>
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-nxbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-nx">New — Jamstack</span>
+          <span class="text-[11px] text-mute">Mobile, full page</span>
+        </div>
+        <div class="overflow-y-auto" style="max-height:640px">
+          <img src="screenshots/jam-stack/nuxt__home__mobile.png" alt="Jamstack home page, mobile, full length — ends with numbered pagination" class="w-full" loading="lazy">
+        </div>
+      </figure>
+    </div>
+    <p class="mt-2 text-[12px] text-mute">On mobile the same pattern holds: the Jamstack feed ends with numbered pagination (<em>1 2 … 9 NEXT</em>); WordPress keeps scrolling.</p>
+
+    <!-- 2. Mobile navigation -->
+    <div class="mb-6 mt-16">
+      <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">Mobile, all pages</p>
+      <h2 id="mobile-nav" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">2. Mobile navigation</h2>
+    </div>
+    <ul class="max-w-2xl list-disc space-y-1.5 pl-5 text-[14px] leading-6 text-neutral-600">
+      <li>A smaller, more readable logo in the mobile header.</li>
+      <li>A rebuilt hamburger menu: it now opens as a <strong class="font-semibold text-ink">full-height panel</strong> instead of a partial dropdown, with a smoother open/close transition and better legibility.</li>
+    </ul>
+    <div class="mt-6 grid gap-4 sm:grid-cols-2">
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-wpbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-wp">Current — WordPress</span>
+          <span class="text-[11px] text-mute">Menu open</span>
+        </div>
+        <img src="screenshots/jam-stack/wp__mobile-menu-open.png" alt="WordPress mobile menu open — larger logo, menu panel does not fill the screen, page content visible below it" class="w-full" loading="lazy">
+      </figure>
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-nxbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-nx">New — Jamstack</span>
+          <span class="text-[11px] text-mute">Menu open</span>
+        </div>
+        <img src="screenshots/jam-stack/nuxt__mobile-menu-open.png" alt="Jamstack mobile menu open — smaller logo, full-height panel with links and footer credit at the bottom" class="w-full" loading="lazy">
+      </figure>
+    </div>
+    <p class="mt-2 text-[12px] text-mute">WordPress: the menu panel is only as tall as its content, leaving page content visible underneath. Jamstack: the panel fills the full viewport height, including a footer credit at the bottom — no visual bleed-through.</p>
+
+    <!-- 3. Single entry layout -->
+    <div class="mb-6 mt-16">
+      <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">/seminars/timber-technologies-2019/ · /courses/making-meaning-2025/</p>
+      <h2 id="single" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">3. Single entry layout</h2>
+    </div>
+    <p class="max-w-2xl text-[15px] leading-7 text-neutral-600">The overall structure is kept close to the original — same content, same order — but the proportions and alignment are corrected. Content order, top to bottom:</p>
+    <ol class="mt-3 max-w-xl list-decimal space-y-1 pl-5 text-[14px] leading-6 text-neutral-600">
+      <li>Breadcrumbs</li>
+      <li>Title (H1)</li>
+      <li>Tags (course type, department, year)</li>
+      <li>Year switcher, when multiple years exist</li>
+      <li>Feature image</li>
+      <li>Body text</li>
+      <li>Extra information (teachers, students)</li>
+      <li>Assets (images, PDFs, carousels)</li>
+    </ol>
+    <ul class="mt-4 max-w-2xl list-disc space-y-1.5 pl-5 text-[14px] leading-6 text-neutral-600">
+      <li>The text column (breadcrumbs through body text) is fixed to exactly <strong class="font-semibold text-ink">50% of the page width</strong>, so it lines up with the assets grid below it instead of floating at an arbitrary width.</li>
+      <li>Assets generally display in <strong class="font-semibold text-ink">2 columns</strong>; a carousel is the exception — it takes <strong class="font-semibold text-ink">2/3</strong> of the row, with its related text alongside in the remaining <strong class="font-semibold text-ink">1/3</strong>.</li>
+    </ul>
+
+    <div class="mt-6 grid gap-4 sm:grid-cols-2">
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-wpbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-wp">Current — WordPress</span>
+          <span class="text-[11px] text-mute">/seminars/timber-technologies-2019/</span>
+        </div>
+        <div class="overflow-y-auto" style="max-height:640px">
+          <img src="screenshots/jam-stack/wp__seminar-timber__desktop.png" alt="WordPress Timber Technologies seminar page, desktop — no breadcrumb, narrower text column, 2-column asset grid" class="w-full" loading="lazy">
+        </div>
+      </figure>
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-nxbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-nx">New — Jamstack</span>
+          <span class="text-[11px] text-mute">/seminars/timber-technologies-2019/</span>
+        </div>
+        <div class="overflow-y-auto" style="max-height:640px">
+          <img src="screenshots/jam-stack/nuxt__seminar-timber__desktop.png" alt="Jamstack Timber Technologies seminar page, desktop — breadcrumb, single feature image, 2-column asset grid aligned to a 50% text column" class="w-full" loading="lazy">
+        </div>
+      </figure>
+    </div>
+    <p class="mt-2 text-[12px] text-mute">Jamstack adds the breadcrumb trail (Home / Seminars / Timber Technologies) and gives the intro text a fixed-width column that lines up with the image grid beneath it.</p>
+
+    <div class="mt-8 grid gap-4 sm:grid-cols-2">
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-wpbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-wp">Current — WordPress</span>
+          <span class="text-[11px] text-mute">/courses/thinking-eye-2025/</span>
+        </div>
+        <div class="overflow-y-auto" style="max-height:640px">
+          <img src="screenshots/jam-stack/wp__course-thinking-eye__desktop.png" alt="WordPress Thinking Eye course page, desktop — text column is unexpectedly narrow, leaving a large empty gap next to it" class="w-full" loading="lazy">
+        </div>
+      </figure>
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-nxbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-nx">New — Jamstack</span>
+          <span class="text-[11px] text-mute">/courses/thinking-eye-2025/</span>
+        </div>
+        <div class="overflow-y-auto" style="max-height:640px">
+          <img src="screenshots/jam-stack/nuxt__course-thinking-eye__desktop.png" alt="Jamstack Thinking Eye course page, desktop — tags, year switcher, full-width feature image, 50% text column" class="w-full" loading="lazy">
+        </div>
+      </figure>
+    </div>
+    <p class="mt-2 text-[12px] text-mute">This page shows the width problem most clearly: on WordPress the text column collapses to roughly a quarter of the page, leaving a large unused gap beside it. Jamstack holds it at a consistent 50%.</p>
+
+    <div class="mt-8 grid gap-4 sm:grid-cols-2">
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-wpbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-wp">Current — WordPress</span>
+          <span class="text-[11px] text-mute">Mobile</span>
+        </div>
+        <div class="overflow-y-auto" style="max-height:640px">
+          <img src="screenshots/jam-stack/wp__course-thinking-eye__mobile.png" alt="WordPress Thinking Eye course page, mobile" class="w-full" loading="lazy">
+        </div>
+      </figure>
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-nxbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-nx">New — Jamstack</span>
+          <span class="text-[11px] text-mute">Mobile</span>
+        </div>
+        <div class="overflow-y-auto" style="max-height:640px">
+          <img src="screenshots/jam-stack/nuxt__course-thinking-eye__mobile.png" alt="Jamstack Thinking Eye course page, mobile — better spacing between text blocks and images" class="w-full" loading="lazy">
+        </div>
+      </figure>
+    </div>
+
+    <!-- 4. PDF viewer -->
+    <div class="mb-6 mt-16">
+      <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">/courses/making-meaning-2025/</p>
+      <h2 id="pdf" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">4. PDF viewer &amp; asset modal</h2>
+    </div>
+    <ul class="max-w-2xl list-disc space-y-1.5 pl-5 text-[14px] leading-6 text-neutral-600">
+      <li>The PDF flipbook keeps the same overall approach as the live site (a lazy-loading, page-by-page flipbook), plus a direct <strong class="font-semibold text-ink">"open PDF"</strong> link that opens the file itself in a new tab.</li>
+      <li>The image/asset modal now shows an <strong class="font-semibold text-ink">index with the asset's title</strong> (e.g. "3 / 12 — Section detail"), and zoom behaves more predictably.</li>
+    </ul>
+    <div class="mt-6 grid gap-4 sm:grid-cols-2">
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-wpbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-wp">Current — WordPress</span>
+          <span class="text-[11px] text-mute">/courses/making-meaning-2025/</span>
+        </div>
+        <div class="overflow-y-auto" style="max-height:640px">
+          <img src="screenshots/jam-stack/wp__course-making-meaning__desktop.png" alt="WordPress Making Meaning course page, desktop — narrow text column with a wide empty gap next to it" class="w-full" loading="lazy">
+        </div>
+      </figure>
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-nxbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-nx">New — Jamstack</span>
+          <span class="text-[11px] text-mute">/courses/making-meaning-2025/</span>
+        </div>
+        <div class="overflow-y-auto" style="max-height:640px">
+          <img src="screenshots/jam-stack/nuxt__course-making-meaning__desktop.png" alt="Jamstack Making Meaning course page, desktop — 50% text column, year switcher, PDF grid with an inline page-flip preview and an 'open PDF' link on each entry" class="w-full" loading="lazy">
+        </div>
+      </figure>
+    </div>
+    <p class="mt-2 text-[12px] text-mute">Each PDF entry keeps its own inline preview <em>and</em> gets an "open PDF ↗" link for a direct, new-tab view of the source file — not shown mid-render here since these are large exhibition-poster PDFs that stream in progressively on both sites.</p>
+
+    <!-- 5. Course archive & filters -->
+    <div class="mb-6 mt-16">
+      <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">/courses/</p>
+      <h2 id="archive" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">5. Course archive &amp; filters</h2>
+    </div>
+    <ul class="max-w-2xl list-disc space-y-1.5 pl-5 text-[14px] leading-6 text-neutral-600">
+      <li>On mobile, the archive controls — the unit/department filter and the course-type tabs (All / Bachelor / Master) — are now properly aligned in a single row, instead of wrapping into a ragged two-line stack.</li>
+      <li>Better alignment between text and images throughout the singular course page (carried over from section 3).</li>
+    </ul>
+    <div class="mt-6 grid gap-4 sm:grid-cols-2">
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-wpbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-wp">Current — WordPress</span>
+          <span class="text-[11px] text-mute">Desktop, full page</span>
+        </div>
+        <div class="overflow-y-auto" style="max-height:640px">
+          <img src="screenshots/jam-stack/wp__courses-archive__desktop.png" alt="WordPress course archive, desktop, full length — filters wrap awkwardly, all courses listed with no pagination, large empty gap toward the bottom" class="w-full" loading="lazy">
+        </div>
+      </figure>
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-nxbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-nx">New — Jamstack</span>
+          <span class="text-[11px] text-mute">Desktop, full page</span>
+        </div>
+        <div class="overflow-y-auto" style="max-height:640px">
+          <img src="screenshots/jam-stack/nuxt__courses-archive__desktop.png" alt="Jamstack course archive, desktop, full length — breadcrumb, tabs and units filter in one aligned row, 9 evenly-sized cards per page" class="w-full" loading="lazy">
+        </div>
+      </figure>
+    </div>
+
+    <div class="mt-8 grid gap-4 sm:grid-cols-2">
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-wpbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-wp">Current — WordPress</span>
+          <span class="text-[11px] text-mute">Mobile, full page</span>
+        </div>
+        <div class="overflow-y-auto" style="max-height:640px">
+          <img src="screenshots/jam-stack/wp__courses-archive__mobile.png" alt="WordPress course archive, mobile — the ALL/BACHELOR/MASTER tabs and UNITS filter wrap into a messy two-line block under the COURSES heading" class="w-full" loading="lazy">
+        </div>
+      </figure>
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-nxbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-nx">New — Jamstack</span>
+          <span class="text-[11px] text-mute">Mobile, full page</span>
+        </div>
+        <div class="overflow-y-auto" style="max-height:640px">
+          <img src="screenshots/jam-stack/nuxt__courses-archive__mobile.png" alt="Jamstack course archive, mobile — COURSES heading, then a clean, aligned row of ALL/BACHELOR/MASTER and the UNITS filter, ending with numbered pagination" class="w-full" loading="lazy">
+        </div>
+      </figure>
+    </div>
+    <p class="mt-2 text-[12px] text-mute">Compare the header block on mobile: WordPress wraps "ALL BACHELOR" onto one line and "MASTER" plus "UNITS" onto another, with inconsistent spacing. Jamstack keeps all three controls aligned on one row under the "COURSES" title.</p>
+
+    <!-- 6. Multi-project studio layout -->
+    <div class="mb-6 mt-16">
+      <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">/sufficiency-consultancy/</p>
+      <h2 id="multi-project" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">6. Multi-project studio layout</h2>
+    </div>
+    <p class="max-w-2xl text-[15px] leading-7 text-neutral-600">Graduation-studio entries like this one list several student projects one after another. The page-level information (breadcrumbs, title, tags, feature image, intro text) still follows the same <strong class="font-semibold text-ink">50% width</strong> rule as any single entry (section 3). What's different is what comes after it: each student project inside the page is its own <strong class="font-semibold text-ink">information + assets</strong> pair, repeated down the page:</p>
+    <ol class="mt-3 max-w-xl list-decimal space-y-1 pl-5 text-[14px] leading-6 text-neutral-600">
+      <li><strong class="font-semibold text-ink">Information first</strong> — that project's title and description text.</li>
+      <li><strong class="font-semibold text-ink">Assets after</strong> — its image carousel, placed next to the text.</li>
+    </ol>
+    <p class="mt-3 max-w-2xl text-[15px] leading-7 text-neutral-600">The proportions match the assets grid's general carousel exception from section 3: the project's <strong class="font-semibold text-ink">text takes 1/3</strong> of the row and its <strong class="font-semibold text-ink">image carousel takes 2/3</strong> — just repeated once per project down the page, instead of appearing once inside a shared assets grid.</p>
+
+    <div class="mt-6 grid gap-4 sm:grid-cols-2">
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-wpbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-wp">Current — WordPress</span>
+          <span class="text-[11px] text-mute">Desktop, full page</span>
+        </div>
+        <div class="overflow-y-auto" style="max-height:640px">
+          <img src="screenshots/jam-stack/wp__sufficiency-consultancy__desktop.png" alt="WordPress Sufficiency Consultancy page, desktop — no breadcrumb, tag/year info split across two lines, each project's text beside a carousel with plain unstyled arrow chevrons" class="w-full" loading="lazy">
+        </div>
+      </figure>
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-nxbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-nx">New — Jamstack</span>
+          <span class="text-[11px] text-mute">Desktop, full page</span>
+        </div>
+        <div class="overflow-y-auto" style="max-height:640px">
+          <img src="screenshots/jam-stack/nuxt__sufficiency-consultancy__desktop.png" alt="Jamstack Sufficiency Consultancy page, desktop — breadcrumb, single-line tags, each project's text at 1/3 width beside its carousel at 2/3 width with circular arrow buttons and dot pagination" class="w-full" loading="lazy">
+        </div>
+      </figure>
+    </div>
+    <p class="mt-2 text-[12px] text-mute">Same repeating text+carousel pattern on both sides. The differences are in the details: WordPress's carousel arrows are bare chevrons with no button background (small, easy to miss); Jamstack gives them a circular button with a visible hit area. WordPress also splits "Graduation Project | AUDE" and the year onto two separate lines; Jamstack keeps the type, department and year on a single tag row, consistent with every other entry type.</p>
+
+    <div class="mt-8 grid gap-4 sm:grid-cols-2">
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-wpbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-wp">Current — WordPress</span>
+          <span class="text-[11px] text-mute">Mobile, full page</span>
+        </div>
+        <div class="overflow-y-auto" style="max-height:640px">
+          <img src="screenshots/jam-stack/wp__sufficiency-consultancy__mobile.png" alt="WordPress Sufficiency Consultancy page, mobile — text and carousel both stack full-width" class="w-full" loading="lazy">
+        </div>
+      </figure>
+      <figure class="overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between border-b border-line bg-nxbg px-4 py-2">
+          <span class="text-[12px] font-semibold text-nx">New — Jamstack</span>
+          <span class="text-[11px] text-mute">Mobile, full page</span>
+        </div>
+        <div class="overflow-y-auto" style="max-height:640px">
+          <img src="screenshots/jam-stack/nuxt__sufficiency-consultancy__mobile.png" alt="Jamstack Sufficiency Consultancy page, mobile — text and carousel both stack full-width, matching WordPress" class="w-full" loading="lazy">
+        </div>
+      </figure>
+    </div>
+    <p class="mt-2 text-[12px] text-mute">On mobile the 1/3 + 2/3 split collapses on both sites — text and carousel each go full-width, stacked — since there's no room for a side-by-side split at that size.</p>
+
+    <!-- Summary -->
+    <div class="mb-6 mt-16">
+      <h2 id="summary" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">Summary</h2>
+    </div>
+    <div class="overflow-hidden rounded-xl border border-line">
+      <table class="min-w-full text-[13px]">
+        <thead>
+          <tr class="border-b border-line bg-panel text-left text-[11px] font-semibold uppercase tracking-wide text-mute">
+            <th class="px-4 py-3 font-semibold">Area</th>
+            <th class="px-4 py-3 font-semibold">WordPress (current)</th>
+            <th class="px-4 py-3 font-semibold">Jamstack (new)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="align-top">
+            <td class="px-4 py-3 font-medium text-ink">Home / News feed</td>
+            <td class="px-4 py-3 text-neutral-600">Unpaginated, grows indefinitely; uneven card heights; larger hero title</td>
+            <td class="px-4 py-3 text-neutral-600">Hero + 9 posts per page, paginated; equal-height cards; smaller hero title</td>
+          </tr>
+          <tr class="border-t border-line align-top">
+            <td class="px-4 py-3 font-medium text-ink">Header spacing</td>
+            <td class="px-4 py-3 text-neutral-600">Fixed top spacing can flatten the menu under ~600px viewport height</td>
+            <td class="px-4 py-3 text-neutral-600">Reduced top spacing avoids squashing the menu at short viewport heights</td>
+          </tr>
+          <tr class="border-t border-line align-top">
+            <td class="px-4 py-3 font-medium text-ink">Search</td>
+            <td class="px-4 py-3 text-neutral-600">Icon/form open abruptly</td>
+            <td class="px-4 py-3 text-neutral-600">Smooth open/close transition</td>
+          </tr>
+          <tr class="border-t border-line align-top">
+            <td class="px-4 py-3 font-medium text-ink">Mobile logo &amp; menu</td>
+            <td class="px-4 py-3 text-neutral-600">Larger logo; menu panel is only as tall as its content</td>
+            <td class="px-4 py-3 text-neutral-600">Smaller, readable logo; full-height menu panel, smoother animation</td>
+          </tr>
+          <tr class="border-t border-line align-top">
+            <td class="px-4 py-3 font-medium text-ink">Single entry text column</td>
+            <td class="px-4 py-3 text-neutral-600">Width varies by page, sometimes far narrower than the assets grid</td>
+            <td class="px-4 py-3 text-neutral-600">Fixed at 50% of the page width, aligned to the assets grid</td>
+          </tr>
+          <tr class="border-t border-line align-top">
+            <td class="px-4 py-3 font-medium text-ink">Asset grid</td>
+            <td class="px-4 py-3 text-neutral-600">2 columns; no distinct carousel treatment</td>
+            <td class="px-4 py-3 text-neutral-600">2 columns in general; carousel takes 2/3 with its text in the remaining 1/3</td>
+          </tr>
+          <tr class="border-t border-line align-top">
+            <td class="px-4 py-3 font-medium text-ink">Asset modal</td>
+            <td class="px-4 py-3 text-neutral-600">Zoom present, no title/index</td>
+            <td class="px-4 py-3 text-neutral-600">Index with title, improved zoom</td>
+          </tr>
+          <tr class="border-t border-line align-top">
+            <td class="px-4 py-3 font-medium text-ink">PDF viewer</td>
+            <td class="px-4 py-3 text-neutral-600">Inline flipbook only</td>
+            <td class="px-4 py-3 text-neutral-600">Same inline flipbook, plus a direct "open PDF" new-tab link</td>
+          </tr>
+          <tr class="border-t border-line align-top">
+            <td class="px-4 py-3 font-medium text-ink">Course archive filters (mobile)</td>
+            <td class="px-4 py-3 text-neutral-600">Type tabs and unit filter wrap into a ragged two-line block</td>
+            <td class="px-4 py-3 text-neutral-600">Type tabs and unit filter aligned in one row</td>
+          </tr>
+          <tr class="border-t border-line align-top">
+            <td class="px-4 py-3 font-medium text-ink">Course archive pagination</td>
+            <td class="px-4 py-3 text-neutral-600">None — full unpaginated list</td>
+            <td class="px-4 py-3 text-neutral-600">9 per page, numbered pagination</td>
+          </tr>
+          <tr class="border-t border-line align-top">
+            <td class="px-4 py-3 font-medium text-ink">Multi-project studio layout</td>
+            <td class="px-4 py-3 text-neutral-600">Text + carousel per project; bare chevron arrows; tag/year split across two lines</td>
+            <td class="px-4 py-3 text-neutral-600">Same 1/3 text + 2/3 carousel pattern; circular arrow buttons; tags on one line</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer class="mt-20 border-t border-line pt-6 text-[12px] text-neutral-400">
+      Digital Exhibition — WordPress → Jamstack visual comparison. See also the <a href="index.html" class="text-accentink hover:underline">migration plan</a> and the <a href="documentation.html" class="text-accentink hover:underline">editor documentation</a>.
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  const links = [...document.querySelectorAll('[href^="#"]')];
+  const byId = Object.fromEntries(links.map(l => [l.getAttribute('href').slice(1), l]));
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        links.forEach(l => l.classList.remove('nav-on'));
+        byId[en.target.id]?.classList.add('nav-on');
+      }
+    });
+  }, { rootMargin: '-15% 0px -75% 0px' });
+  Object.keys(byId).forEach(id => { const el = document.getElementById(id); if (el) io.observe(el); });
+</script>
+</body>
+</html>
