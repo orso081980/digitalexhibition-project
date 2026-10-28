@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digital Exhibition — WordPress &amp; App Recap</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        ink: '#16181d', mute: '#6b7280', line: '#e7e7e9', panel: '#fafafa',
+        accent: '#ea580c', accentink: '#9a3412',
+      },
+      fontFamily: {
+        sans: ['Inter','ui-sans-serif','system-ui','-apple-system','Segoe UI','Roboto','sans-serif'],
+        serif: ['Newsreader','Georgia','ui-serif','serif'],
+        mono: ['ui-monospace','SFMono-Regular','Menlo','monospace'],
+      },
+    },
+  },
+}
+</script>
+<style>
+  body{ font-feature-settings:'cv05','ss01'; letter-spacing:-0.006em; }
+  ::selection{ background:#ea580c; color:#fff; }
+  .nav-on{ color:#16181d; }
+  .nav-on::before{ opacity:1; transform:scaleY(1); }
+  .nav-lnk::before{ content:''; position:absolute; left:-13px; top:3px; bottom:3px; width:2px; background:#ea580c; opacity:0; transform:scaleY(.3); transition:.15s; }
+  .flow-dash{ background-image:linear-gradient(90deg,#d4d4d8 50%,transparent 0); background-size:8px 2px; }
+  @media print {
+    .no-print{ display:none !important; }
+    aside{ display:none !important; }
+    main{ max-width:none !important; }
+    body{ font-size:10.5pt; }
+    figure, .avoid-break{ break-inside:avoid; }
+  }
+</style>
+</head>
+<body class="bg-white font-sans text-[15px] leading-relaxed text-ink antialiased">
+
+<header class="no-print sticky top-0 z-30 border-b border-line bg-white/85 backdrop-blur">
+  <div class="mx-auto flex h-14 max-w-[1140px] items-center justify-between px-6">
+    <div class="flex items-baseline gap-2.5">
+      <span class="text-sm font-semibold tracking-tight">Digital Exhibition</span>
+      <span class="text-xs text-mute">WordPress &amp; App Recap</span>
+    </div>
+    <button onclick="window.print()" class="rounded-md border border-line px-2.5 py-1 text-xs font-medium text-mute transition hover:border-mute hover:text-ink"><i class="fa-solid fa-file-pdf mr-1.5"></i>Save PDF</button>
+  </div>
+</header>
+
+<div class="mx-auto grid max-w-[1140px] grid-cols-1 gap-x-14 px-6 lg:grid-cols-[210px_minmax(0,1fr)]">
+  <aside class="hidden lg:block">
+    <div class="sticky top-24 py-14">
+      <nav id="toc" class="space-y-1 border-l border-line pl-3 text-[13px]">
+        <a href="#tldr" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">TL;DR</a>
+        <a href="#domains" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">Domains</a>
+        <a href="#todo" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">What is still open</a>
+        <a href="#changes" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">What changed on staging</a>
+        <a href="#app" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">How the app works</a>
+        <a href="#rest" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">REST API &amp; Jamstack</a>
+        <a href="#media" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">Shared media bucket</a>
+        <a href="#postmortem" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">Post-mortem</a>
+      </nav>
+      <dl id="docmeta" class="mt-8 space-y-2 border-t border-line pt-6 text-[12px] text-mute"></dl>
+    </div>
+  </aside>
+
+  <main class="min-w-0 py-14">
+
+    <!-- Intro + TL;DR -->
+    <p id="kicker" class="text-[11px] font-semibold uppercase tracking-[0.16em] text-mute"></p>
+    <h1 id="title" class="mt-3 max-w-3xl font-serif text-[40px] font-medium leading-[1.12] tracking-tight text-ink md:text-[46px]"></h1>
+    <p id="subtitle" class="mt-3 max-w-2xl text-lg text-mute"></p>
+    <p id="scope" class="mt-5 inline-flex items-center gap-2 rounded-md bg-panel px-3 py-1.5 text-[13px] text-neutral-600 ring-1 ring-inset ring-line"><i class="fa-solid fa-laptop-code text-mute"></i><span></span></p>
+
+    <div class="mb-6 mt-14">
+      <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">In short</p>
+      <h2 id="tldr" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">TL;DR</h2>
+    </div>
+    <ol id="tldr-list" class="max-w-3xl space-y-3"></ol>
+
+    <!-- Domains -->
+    <div class="mb-6 mt-16">
+      <h2 id="domains" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">Domains</h2>
+    </div>
+    <div id="domain-grid" class="grid gap-3 sm:grid-cols-2"></div>
+
+    <h3 class="mt-10 text-[15px] font-semibold">Planned layout after go-live</h3>
+    <p class="mt-1 max-w-2xl text-[14px] leading-6 text-neutral-600">The main domain will show the application. The two WordPress environments move to their own addresses.</p>
+    <div id="target-grid" class="mt-4 grid gap-3 md:grid-cols-3"></div>
+
+    <!-- What is still open -->
+    <div class="mb-6 mt-16">
+      <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">Action points</p>
+      <h2 id="todo" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">What is still open</h2>
+    </div>
+    <p class="max-w-3xl text-[15px] leading-7 text-neutral-600">Each item below says who we are waiting on and what we need from them.</p>
+    <div id="action-list" class="mt-6 space-y-3"></div>
+
+    <!-- What changed -->
+    <div class="mb-6 mt-16">
+      <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">Staging / localhost</p>
+      <h2 id="changes" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">What changed on staging</h2>
+    </div>
+    <p class="max-w-3xl text-[15px] leading-7 text-neutral-600">The live site still has its current content, with only a few plugins added or removed. Staging has had several changes. They will be carried over to the live site when we go live.</p>
+    <div id="plugin-grid" class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"></div>
+
+    <div class="mt-8 grid gap-3 md:grid-cols-2">
+      <div id="env-box" class="rounded-xl border border-line p-5">
+        <h3 class="text-[15px] font-semibold"><i class="fa-solid fa-flask mr-2 text-amber-600"></i>Two jobs for the staging environment</h3>
+        <ul id="env-list" class="mt-3 space-y-3"></ul>
+      </div>
+      <div id="email-box" class="rounded-xl border border-line p-5"></div>
+    </div>
+
+    <h3 class="mt-12 text-[15px] font-semibold">Screenshots of the new admin</h3>
+    <p class="mt-1 max-w-3xl text-[14px] leading-6 text-neutral-600">Taken on the localhost WordPress (the staging copy). Admin notices that are unrelated to this work, such as plugin licence and upgrade banners, were hidden for clarity.</p>
+    <div id="shot-grid" class="mt-4 grid gap-4 md:grid-cols-2"></div>
+
+    <!-- How the app works -->
+    <div class="mb-6 mt-16">
+      <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">The application</p>
+      <h2 id="app" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">How the app works</h2>
+    </div>
+    <p class="max-w-3xl text-[15px] leading-7 text-neutral-600">Editors keep working in WordPress. The Nuxt application reads that content through the WordPress REST API and shows it in a different layout. Images are not copied: all three sites use one shared bucket.</p>
+
+    <!-- Architecture diagram -->
+    <figure class="avoid-break mt-8 rounded-xl border border-line bg-panel p-5 md:p-7" aria-label="Architecture diagram">
+      <div class="grid items-stretch gap-2 lg:grid-cols-[1fr_auto_1.25fr_auto_1.25fr_auto_1fr]">
+
+        <div class="rounded-lg border border-line bg-white p-4 text-center">
+          <i class="fa-solid fa-user-pen text-2xl text-neutral-500"></i>
+          <p class="mt-2 text-[13px] font-semibold">Editors</p>
+          <p class="mt-1 text-[12px] leading-5 text-mute">Write and publish pages in the WordPress admin</p>
+        </div>
+
+        <div class="flex flex-col items-center justify-center gap-1 py-1 text-mute lg:px-1">
+          <i class="fa-solid fa-arrow-down lg:hidden"></i><i class="fa-solid fa-arrow-right hidden lg:block"></i>
+          <span class="text-[10px] font-medium uppercase tracking-wide">write</span>
+        </div>
+
+        <div class="rounded-lg border border-emerald-200 bg-white p-4">
+          <div class="text-center">
+            <i class="fa-brands fa-wordpress text-2xl text-emerald-700"></i>
+            <p class="mt-2 text-[13px] font-semibold">WordPress</p>
+            <p class="mt-1 text-[12px] leading-5 text-mute">Content store. Not shown to visitors; users open it to check the content</p>
+          </div>
+          <div class="mt-3 flex flex-wrap justify-center gap-1.5 text-[11px]">
+            <span class="rounded bg-emerald-50 px-2 py-0.5 font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">live</span>
+            <span class="rounded bg-amber-50 px-2 py-0.5 font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20">staging</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col items-center justify-center gap-1 py-1 text-accentink lg:px-1">
+          <i class="fa-solid fa-arrow-down lg:hidden"></i><i class="fa-solid fa-arrow-right hidden lg:block"></i>
+          <span class="text-center text-[10px] font-semibold uppercase leading-tight tracking-wide">REST API<br>JSON</span>
+        </div>
+
+        <div class="rounded-lg border border-sky-200 bg-white p-4">
+          <div class="text-center">
+            <i class="fa-solid fa-cloud text-2xl text-sky-700"></i>
+            <p class="mt-2 text-[13px] font-semibold">Nuxt on Cloudflare</p>
+            <p class="mt-1 text-[12px] leading-5 text-mute">Builds every page once and serves it from the edge</p>
+          </div>
+        </div>
+
+        <div class="flex flex-col items-center justify-center gap-1 py-1 text-mute lg:px-1">
+          <i class="fa-solid fa-arrow-down lg:hidden"></i><i class="fa-solid fa-arrow-right hidden lg:block"></i>
+          <span class="text-[10px] font-medium uppercase tracking-wide">pages</span>
+        </div>
+
+        <div class="rounded-lg border border-line bg-white p-4 text-center">
+          <i class="fa-solid fa-users text-2xl text-neutral-500"></i>
+          <p class="mt-2 text-[13px] font-semibold">Visitors</p>
+          <p class="mt-1 text-[12px] leading-5 text-mute">Desktop and mobile</p>
+        </div>
+      </div>
+
+      <!-- Deploy button path -->
+      <div class="mt-4 flex flex-col items-stretch gap-2 rounded-lg border border-dashed border-orange-300 bg-orange-50/60 px-4 py-3 md:flex-row md:items-center md:gap-4">
+        <span class="inline-flex shrink-0 items-center gap-2 rounded-md bg-white px-2.5 py-1 text-[12px] font-semibold text-accentink ring-1 ring-inset ring-orange-200"><i class="fa-solid fa-rocket"></i>Deploy Frontend button</span>
+        <p class="text-[12.5px] leading-5 text-neutral-600">Pressed in WordPress, it tells Cloudflare to rebuild the app. Nothing reaches visitors until someone presses it, so half-finished pages are never published.</p>
+      </div>
+
+      <!-- Shared bucket -->
+      <div class="mt-4 rounded-lg border border-line bg-white p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <span class="inline-flex items-center gap-2 text-[13px] font-semibold"><i class="fa-solid fa-bucket text-orange-600"></i>One shared Cloudflare R2 bucket</span>
+          <span class="text-[12px] text-mute">all images and PDFs · 16.5 GB</span>
+        </div>
+        <div class="mt-3 grid gap-2 sm:grid-cols-3">
+          <div class="flex items-center gap-2 rounded-md bg-panel px-3 py-2 text-[12px] ring-1 ring-inset ring-line"><i class="fa-solid fa-arrows-up-down text-emerald-700"></i>WordPress live</div>
+          <div class="flex items-center gap-2 rounded-md bg-panel px-3 py-2 text-[12px] ring-1 ring-inset ring-line"><i class="fa-solid fa-arrows-up-down text-amber-600"></i>WordPress staging</div>
+          <div class="flex items-center gap-2 rounded-md bg-panel px-3 py-2 text-[12px] ring-1 ring-inset ring-line"><i class="fa-solid fa-arrow-down text-sky-700"></i>Nuxt application</div>
+        </div>
+      </div>
+      <figcaption class="mt-3 text-[12px] text-mute">Arrows show the direction data moves. WordPress uploads files to the bucket; the application only reads from it.</figcaption>
+    </figure>
+
+    <!-- Publish flow -->
+    <h3 class="mt-12 text-[15px] font-semibold">From edit to visitor, step by step</h3>
+    <ol id="flow" class="mt-4 grid gap-3 md:grid-cols-5"></ol>
+    <p class="mt-3 max-w-3xl text-[12.5px] leading-5 text-mute"><i class="fa-solid fa-circle-info mr-1.5 text-neutral-400"></i>Why the manual “Press Deploy” step? It saves API calls. On a server-side-rendered website every visit would call WordPress, and that can be costly. Here WordPress is called once per deploy instead.</p>
+
+    <!-- REST API & Jamstack -->
+    <div class="mb-6 mt-16">
+      <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">Jamstack in practice</p>
+      <h2 id="rest" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">REST API &amp; Jamstack</h2>
+    </div>
+    <p class="max-w-3xl text-[15px] leading-7 text-neutral-600">Jamstack means the site is built ahead of time instead of being assembled on every visit. WordPress becomes a content source, and the visitor never touches it.</p>
+
+    <div class="mt-6 grid gap-3 md:grid-cols-3">
+      <div class="rounded-xl border border-line p-5">
+        <i class="fa-brands fa-vuejs text-xl text-emerald-600"></i>
+        <h3 class="mt-3 text-[14px] font-semibold"><span class="font-serif text-lg text-accentink">J</span>avaScript</h3>
+        <p class="mt-1 text-[13px] leading-5 text-neutral-600">Nuxt (Vue) and Tailwind draw the layout.</p>
+      </div>
+      <div class="rounded-xl border border-line p-5">
+        <i class="fa-solid fa-plug text-xl text-sky-600"></i>
+        <h3 class="mt-3 text-[14px] font-semibold"><span class="font-serif text-lg text-accentink">A</span>PIs</h3>
+        <p class="mt-1 text-[13px] leading-5 text-neutral-600">The WordPress REST API supplies the content. Brevo handles the contact form mail.</p>
+      </div>
+      <div class="rounded-xl border border-line p-5">
+        <i class="fa-brands fa-html5 text-xl text-orange-600"></i>
+        <h3 class="mt-3 text-[14px] font-semibold"><span class="font-serif text-lg text-accentink">M</span>arkup</h3>
+        <p class="mt-1 text-[13px] leading-5 text-neutral-600">Every page is turned into ready-made HTML at build time and served from Cloudflare's edge.</p>
+      </div>
+    </div>
+
+    <h3 class="mt-10 text-[15px] font-semibold">Try the live API</h3>
+    <p class="mt-1 max-w-3xl text-[14px] leading-6 text-neutral-600">This request goes from your browser to the live WordPress site and returns its content as JSON. The app does the same thing at build time. Pick an example or edit the request yourself.</p>
+
+    <div id="rest-presets" class="no-print mt-4 flex flex-wrap gap-1.5"></div>
+
+    <div class="avoid-break mt-3 overflow-hidden rounded-xl border border-line">
+      <form id="rest-form" class="flex flex-col gap-2 border-b border-line bg-panel px-4 py-3 sm:flex-row sm:items-center">
+        <span class="inline-flex w-fit shrink-0 items-center rounded bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/20">GET</span>
+        <div class="flex min-w-0 flex-1 items-center overflow-hidden rounded-md border border-line bg-white font-mono text-[12px] focus-within:border-neutral-400">
+          <span id="rest-root" class="hidden shrink-0 select-none border-r border-line bg-neutral-50 px-2.5 py-1.5 text-mute md:block"></span>
+          <input id="rest-call" type="text" spellcheck="false" autocomplete="off" aria-label="REST API request" class="min-w-0 flex-1 bg-transparent px-2.5 py-1.5 text-neutral-800 outline-none">
+        </div>
+        <button id="rest-run" type="submit" class="no-print inline-flex w-fit shrink-0 items-center gap-1.5 rounded-md bg-ink px-3 py-1.5 text-[12px] font-medium text-white transition hover:bg-neutral-700"><i class="fa-solid fa-play"></i>Run request</button>
+      </form>
+      <div id="rest-status" class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-line px-4 py-2 text-[12px] text-mute"></div>
+      <pre id="rest-out" class="max-h-[340px] overflow-auto bg-[#16181d] p-4 font-mono text-[12px] leading-5 text-neutral-200"></pre>
+    </div>
+
+    <div class="mt-8 grid gap-6 lg:grid-cols-2">
+      <div>
+        <h3 class="text-[15px] font-semibold">What the API exposes</h3>
+        <div class="mt-3 overflow-hidden rounded-xl border border-line">
+          <table class="w-full text-left text-[13px]">
+            <thead class="bg-panel text-[11px] uppercase tracking-wide text-mute">
+              <tr><th class="px-4 py-2 font-medium">Endpoint</th><th class="px-4 py-2 text-right font-medium">Items</th></tr>
+            </thead>
+            <tbody id="endpoint-rows" class="divide-y divide-line"></tbody>
+          </table>
+        </div>
+        <p id="pages-note" class="mt-3 text-[12.5px] leading-5 text-mute"></p>
+      </div>
+      <div>
+        <h3 class="text-[15px] font-semibold">How the app uses each JSON field</h3>
+        <ul id="field-list" class="mt-3 space-y-2"></ul>
+      </div>
+    </div>
+
+    <!-- Media bucket -->
+    <div class="mb-6 mt-16">
+      <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">Images and PDFs</p>
+      <h2 id="media" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">Shared media bucket</h2>
+    </div>
+    <p class="max-w-3xl text-[15px] leading-7 text-neutral-600">Live, staging and the Nuxt application will all read their images from the same bucket. This saves space, because we only keep one copy.</p>
+
+    <div class="avoid-break mt-6 grid items-stretch gap-3 md:grid-cols-[1fr_auto_1fr]">
+      <div class="rounded-xl border border-line p-5">
+        <p class="text-[11px] font-semibold uppercase tracking-wide text-mute">Today</p>
+        <ul id="storage-before" class="mt-3 space-y-2"></ul>
+        <p class="mt-4 border-t border-line pt-3 text-[13px] text-neutral-600"><span class="font-semibold text-ink">49.5 GB</span> in three places</p>
+      </div>
+      <div class="flex items-center justify-center text-accentink"><i class="fa-solid fa-arrow-down md:hidden"></i><i class="fa-solid fa-arrow-right hidden text-lg md:block"></i></div>
+      <div class="rounded-xl border border-orange-200 bg-orange-50/50 p-5">
+        <p class="text-[11px] font-semibold uppercase tracking-wide text-accentink">After</p>
+        <div id="storage-after" class="mt-3"></div>
+        <ul id="storage-users" class="mt-3 flex flex-wrap gap-1.5"></ul>
+        <p class="mt-4 border-t border-orange-200 pt-3 text-[13px] text-neutral-600"><span class="font-semibold text-ink">16.5 GB</span> in one place</p>
+      </div>
+    </div>
+
+    <!-- Post-mortem -->
+    <div class="mb-6 mt-16">
+      <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">Incident</p>
+      <h2 id="postmortem" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">Post-mortem</h2>
+    </div>
+    <p id="pm-summary" class="max-w-3xl text-[15px] leading-7 text-neutral-600"></p>
+    <ol id="pm-chain" class="mt-6 grid gap-3 md:grid-cols-4"></ol>
+    <h3 id="pm-now-title" class="mt-10 text-[15px] font-semibold"></h3>
+    <ul id="pm-points" class="mt-4 space-y-2"></ul>
+    <div id="pm-question" class="mt-4 flex gap-3 rounded-xl border border-amber-200 bg-amber-50/60 p-4"></div>
+
+    <footer class="mt-20 border-t border-line pt-6 text-[12px] text-mute">
+      Part of the migration documentation · see also
+      <a class="text-accentink hover:underline" href="index.html">Migration plan</a>,
+      <a class="text-accentink hover:underline" href="jam-stack.html">WordPress → Jamstack comparison</a> and
+      <a class="text-accentink hover:underline" href="documentation.html">Editor documentation</a>.
+    </footer>
+  </main>
+</div>
+
+<template id="err-tpl">
+  <div class="rounded-lg border border-red-200 bg-red-50 p-6 text-sm text-red-800">
+    <p class="font-semibold">Could not load <code>recap.json</code>.</p>
+    <pre class="mt-3 overflow-x-auto rounded bg-white p-3 text-xs">cd project &amp;&amp; python3 -m http.server 8080
+# then open http://localhost:8080/recap.html</pre>
+  </div>
+</template>
+
+<script>
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const $ = id => document.getElementById(id);
+const host = u => u.replace(/^https?:\/\//,'').replace(/\/$/,'');
+
+const TONE = {
+  emerald: ['bg-emerald-50 text-emerald-700 ring-emerald-600/20', 'text-emerald-700'],
+  amber:   ['bg-amber-50 text-amber-700 ring-amber-600/20',       'text-amber-600'],
+  sky:     ['bg-sky-50 text-sky-700 ring-sky-600/20',             'text-sky-700'],
+  neutral: ['bg-neutral-100 text-neutral-600 ring-neutral-500/20','text-neutral-500'],
+};
+const STATUS = {
+  waiting: ['Waiting for reply', 'bg-amber-50 text-amber-700 ring-amber-600/20'],
+  ours:    ['Our task',          'bg-sky-50 text-sky-700 ring-sky-600/20'],
+};
+const FLOW = [
+  ['fa-pen-to-square', 'Edit', 'An editor writes or updates a page in WordPress.'],
+  ['fa-rocket',        'Press Deploy', 'One click on “Deploy Frontend”. A 60-second cooldown stops repeated clicks.'],
+  ['fa-hammer',        'Cloudflare builds', 'Cloudflare runs the Nuxt build for the application.'],
+  ['fa-download',      'Read the API', 'The build calls the REST API once and creates a ready-made page for every route.'],
+  ['fa-bolt',          'Visitors', 'Pages are served from Cloudflare’s edge, with no WordPress call per visit.'],
+];
+
+async function boot(){
+  let D;
+  try {
+    const res = await fetch('recap.json', { cache:'no-store' });
+    if(!res.ok) throw new Error(res.status);
+    D = await res.json();
+  } catch(e){
+    $('title').textContent = 'Digital Exhibition — WordPress & App Recap';
+    $('title').after($('err-tpl').content.cloneNode(true));
+    return;
+  }
+  render(D);
+  initRest(D.rest);
+  spy();
+}
+
+function render(D){
+  const m = D.meta;
+  $('kicker').textContent = m.client;
+  $('title').textContent = m.title;
+  $('subtitle').textContent = m.subtitle;
+  $('scope').querySelector('span').textContent = m.scope;
+
+  $('docmeta').innerHTML = [['Prepared by', m.author], ['Updated', m.updated]]
+    .map(([k,v]) => `<div><dt class="text-[10px] uppercase tracking-wide text-neutral-400">${k}</dt><dd class="text-ink break-all">${esc(v)}</dd></div>`).join('');
+
+  $('tldr-list').innerHTML = D.tldr.map((t,i) => `
+    <li class="flex gap-4">
+      <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/10 font-serif text-[13px] font-medium text-accentink">${i+1}</span>
+      <p class="text-[15px] leading-7 text-neutral-700">${esc(t)}</p>
+    </li>`).join('');
+
+  $('domain-grid').innerHTML = D.domains.map(d => {
+    const [badge, ico] = TONE[d.tone] || TONE.neutral;
+    const iconCls = d.icon.includes('fa-brands') ? d.icon : `fa-solid ${d.icon}`;
+    const link = d.linkable === false
+      ? `<span class="break-all font-mono text-[12px] text-neutral-500">${esc(host(d.url))}</span>`
+      : `<a href="${esc(d.url)}" target="_blank" rel="noopener noreferrer" class="break-all font-mono text-[12px] text-accentink hover:underline">${esc(host(d.url))} <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>`;
+    return `
+    <div class="avoid-break flex gap-4 rounded-xl border border-line p-4">
+      <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-panel ring-1 ring-inset ring-line"><i class="${iconCls} text-lg ${ico}"></i></div>
+      <div class="min-w-0">
+        <div class="flex flex-wrap items-center gap-2">
+          <h3 class="text-[14px] font-semibold">${esc(d.label)}</h3>
+          <span class="rounded px-1.5 py-0.5 text-[10.5px] font-semibold ring-1 ring-inset ${badge}">${esc(d.badge)}</span>
+        </div>
+        <div class="mt-1">${link}</div>
+        <p class="mt-1.5 text-[12.5px] leading-5 text-neutral-600">${esc(d.role)}</p>
+      </div>
+    </div>`;
+  }).join('');
+
+  $('target-grid').innerHTML = D.targetDomains.map(t => {
+    const [, ico] = TONE[t.tone] || TONE.neutral;
+    return `
+    <div class="avoid-break rounded-xl border border-line p-4">
+      <i class="fa-solid ${t.icon} ${ico}"></i>
+      <p class="mt-2 break-all font-mono text-[12px] font-medium text-ink">${esc(t.host)}</p>
+      <p class="mt-1 text-[12.5px] leading-5 text-neutral-600">${esc(t.serves)}</p>
+    </div>`;
+  }).join('');
+
+  $('action-list').innerHTML = D.actions.map(a => {
+    const [label, cls] = STATUS[a.status] || STATUS.ours;
+    return `
+    <div class="avoid-break rounded-xl border border-line p-5">
+      <div class="flex flex-wrap items-start gap-4">
+        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-panel ring-1 ring-inset ring-line"><i class="fa-solid ${a.icon} text-neutral-600"></i></div>
+        <div class="min-w-0 flex-1">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="font-mono text-[11px] text-neutral-400">${esc(a.id)}</span>
+            <h3 class="text-[15px] font-semibold">${esc(a.title)}</h3>
+            <span class="rounded px-1.5 py-0.5 text-[10.5px] font-semibold ring-1 ring-inset ${cls}">${label}</span>
+          </div>
+          <p class="mt-2 text-[13.5px] leading-6 text-neutral-600">${esc(a.detail)}</p>
+          <div class="mt-3 flex flex-col gap-1.5 rounded-lg bg-panel px-3.5 py-2.5 text-[13px] sm:flex-row sm:gap-6">
+            <span><span class="text-[10px] font-semibold uppercase tracking-wide text-neutral-400">Waiting on</span><br><span class="font-medium text-ink">${esc(a.waitingOn)}</span></span>
+            <span class="min-w-0 flex-1"><span class="text-[10px] font-semibold uppercase tracking-wide text-neutral-400">What we need</span><br><span class="text-neutral-700">${esc(a.ask)}</span></span>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  $('plugin-grid').innerHTML = D.plugins.map(p => `
+    <div class="avoid-break rounded-xl border border-line p-4">
+      <div class="flex items-center justify-between gap-2">
+        <i class="fa-solid ${p.icon} text-lg text-accentink"></i>
+        <span class="rounded bg-neutral-100 px-1.5 py-0.5 text-[10.5px] font-medium text-neutral-600">${esc(p.kind)}</span>
+      </div>
+      <h3 class="mt-3 text-[14px] font-semibold">${esc(p.name)}</h3>
+      <p class="mt-1 text-[12.5px] leading-5 text-neutral-600">${esc(p.does)}</p>
+    </div>`).join('');
+
+  $('env-list').innerHTML = D.environments.map(e => `
+    <li class="flex gap-3">
+      <i class="fa-solid ${e.icon} mt-1 w-4 text-center text-neutral-500"></i>
+      <div><p class="text-[13.5px] font-medium">${esc(e.title)}</p><p class="text-[12.5px] leading-5 text-neutral-600">${esc(e.text)}</p></div>
+    </li>`).join('');
+
+  const em = D.email;
+  $('email-box').innerHTML = `
+    <h3 class="text-[15px] font-semibold"><i class="fa-solid fa-envelope mr-2 text-sky-600"></i>${esc(em.title)}</h3>
+    <p class="mt-3 text-[13px] leading-6 text-neutral-600">${esc(em.text)}</p>
+    <a href="${esc(em.url)}" target="_blank" rel="noopener noreferrer" class="mt-3 inline-block text-[13px] font-medium text-accentink hover:underline">${esc(em.urlLabel)} <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>`;
+
+  $('shot-grid').innerHTML = D.screenshots.map(s => `
+    <figure class="avoid-break overflow-hidden rounded-xl border border-line shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+      <div class="flex items-center gap-1.5 border-b border-line bg-panel px-4 py-2.5">
+        <span class="h-2 w-2 rounded-full bg-neutral-300"></span><span class="h-2 w-2 rounded-full bg-neutral-300"></span><span class="h-2 w-2 rounded-full bg-neutral-300"></span>
+        <span class="ml-2 text-[12px] font-semibold">${esc(s.title)}</span>
+      </div>
+      <div class="shot-frame bg-neutral-50">
+        <a href="${esc(s.src)}" target="_blank" rel="noopener noreferrer" title="Open full size" class="block"><img src="${esc(s.src)}" alt="${esc(s.title)} screenshot" data-src="${esc(s.src)}" class="w-full" loading="lazy"></a>
+      </div>
+      <figcaption class="px-4 py-3 text-[12.5px] leading-5 text-neutral-600">${esc(s.caption)}</figcaption>
+    </figure>`).join('');
+  document.querySelectorAll('#shot-grid img').forEach(img => img.addEventListener('error', () => {
+    img.closest('.shot-frame').innerHTML = `<div class="flex h-48 flex-col items-center justify-center gap-2 px-6 text-center text-neutral-400">
+      <i class="fa-regular fa-image text-2xl"></i>
+      <span class="text-[12px] font-medium">Screenshot pending</span>
+      <code class="break-all text-[11px]">${esc(img.dataset.src)}</code></div>`;
+  }));
+
+  $('flow').innerHTML = FLOW.map(([ico, t, d], i) => `
+    <li class="avoid-break rounded-xl border border-line p-4">
+      <div class="flex items-center justify-between">
+        <span class="flex h-7 w-7 items-center justify-center rounded-full bg-accent/10 font-serif text-[13px] font-medium text-accentink">${i+1}</span>
+        <i class="fa-solid ${ico} text-neutral-400"></i>
+      </div>
+      <h4 class="mt-3 text-[13.5px] font-semibold">${esc(t)}</h4>
+      <p class="mt-1 text-[12.5px] leading-5 text-neutral-600">${esc(d)}</p>
+    </li>`).join('');
+
+  const R = D.rest;
+  $('endpoint-rows').innerHTML = R.endpoints.map(e => `
+    <tr>
+      <td class="px-4 py-2.5"><code class="text-[12px] text-ink">${esc(e.path)}</code><div class="text-[12px] text-mute">${esc(e.usedFor)}</div></td>
+      <td class="px-4 py-2.5 text-right font-medium tabular-nums">${e.total.toLocaleString('en-US')}</td>
+    </tr>`).join('');
+  $('pages-note').textContent = R.pagesNote;
+  $('field-list').innerHTML = R.fields.map(f => `
+    <li class="flex gap-3 rounded-lg border border-line px-3.5 py-2.5">
+      <i class="fa-solid ${f.icon} mt-1 w-4 text-center text-neutral-400"></i>
+      <div class="min-w-0"><code class="text-[12px] font-medium text-ink">${esc(f.field)}</code><p class="text-[12.5px] leading-5 text-neutral-600">${esc(f.use)}</p></div>
+    </li>`).join('');
+
+  const S = D.storage;
+  $('storage-before').innerHTML = S.before.map(b => `
+    <li class="flex items-center justify-between gap-3 rounded-md bg-panel px-3 py-2 text-[13px] ring-1 ring-inset ring-line">
+      <span class="flex items-center gap-2"><i class="fa-solid fa-hard-drive text-neutral-400"></i>${esc(b.label)}</span><span class="font-medium tabular-nums">${esc(b.size)}</span>
+    </li>`).join('');
+  $('storage-after').innerHTML = `
+    <div class="flex items-center justify-between gap-3 rounded-md bg-white px-3 py-2 text-[13px] ring-1 ring-inset ring-orange-200">
+      <span class="flex items-center gap-2"><i class="fa-solid fa-bucket text-orange-600"></i>${esc(S.after.label)}</span><span class="font-medium tabular-nums">${esc(S.after.size)}</span>
+    </div>`;
+  $('storage-users').innerHTML = S.users.map(u => `<li class="rounded bg-white px-2 py-0.5 text-[11.5px] text-neutral-600 ring-1 ring-inset ring-orange-200">${esc(u)}</li>`).join('');
+
+  const P = D.postmortem;
+  $('pm-summary').textContent = P.summary;
+  $('pm-chain').innerHTML = P.chain.map((c,i) => `
+    <li class="avoid-break relative rounded-xl border ${i === P.chain.length-1 ? 'border-red-200 bg-red-50/60' : 'border-line'} p-4">
+      <i class="fa-solid ${c.icon} ${i === P.chain.length-1 ? 'text-red-600' : 'text-neutral-500'}"></i>
+      <h4 class="mt-3 text-[13.5px] font-semibold">${esc(c.label)}</h4>
+      <p class="mt-1 text-[12.5px] leading-5 text-neutral-600">${esc(c.text)}</p>
+      ${i < P.chain.length-1 ? '<i class="fa-solid fa-chevron-right absolute -right-2.5 top-1/2 z-10 hidden h-5 w-5 -translate-y-1/2 rounded-full bg-white text-center text-[10px] leading-5 text-neutral-400 ring-1 ring-line md:block"></i>' : ''}
+    </li>`).join('');
+  const N = P.now;
+  $('pm-now-title').textContent = N.title;
+  $('pm-points').innerHTML = N.points.map(pt => `
+    <li class="avoid-break flex items-start gap-3 rounded-lg border border-line px-4 py-3">
+      <i class="fa-solid ${pt.icon} mt-1 w-4 text-center text-neutral-500"></i>
+      <p class="text-[13.5px] leading-6 text-neutral-700">${esc(pt.text)}</p>
+    </li>`).join('');
+  $('pm-question').innerHTML = `
+    <i class="fa-solid fa-circle-question mt-0.5 text-amber-600"></i>
+    <div><p class="text-[10px] font-semibold uppercase tracking-wide text-amber-700">Open question</p>
+    <p class="mt-0.5 text-[13.5px] leading-6 text-neutral-700">${esc(N.question)}</p></div>`;
+}
+
+function initRest(R){
+  const input = $('rest-call');
+  $('rest-root').textContent = R.root;
+  input.value = R.demo;
+
+  $('rest-presets').innerHTML = R.presets.map((p,i) =>
+    `<button type="button" data-i="${i}" class="rounded-full bg-panel px-3 py-1 text-xs font-medium text-mute ring-1 ring-inset ring-line transition hover:text-ink">${esc(p.label)}</button>`).join('');
+  $('rest-presets').addEventListener('click', e => {
+    const btn = e.target.closest('button[data-i]');
+    if(!btn) return;
+    input.value = R.presets[btn.dataset.i].call;
+    runRest(R);
+  });
+  $('rest-form').addEventListener('submit', e => { e.preventDefault(); runRest(R); });
+  runRest(R);
+}
+
+async function runRest(R){
+  const out = $('rest-out'), st = $('rest-status');
+  const call = $('rest-call').value.trim().replace(/^\/+/, '');
+  const fail = msg => {
+    st.innerHTML = `<span class="font-medium text-red-700"><i class="fa-solid fa-circle-xmark mr-1.5"></i>${esc(msg)}</span>`;
+  };
+
+  // Stay on the live WordPress REST root: the box only edits what follows it.
+  let target;
+  try { target = new URL(call, R.root); } catch(e){ out.textContent = ''; return fail('That is not a valid request.'); }
+  if(!target.href.startsWith(R.root)){ out.textContent = ''; return fail('Requests are limited to ' + R.root); }
+
+  out.textContent = 'Loading…';
+  st.innerHTML = '<span><i class="fa-solid fa-spinner fa-spin mr-1.5"></i>Calling the live API…</span>';
+  try {
+    const t0 = performance.now();
+    const res = await fetch(target.href, { headers:{ Accept:'application/json' } });
+    const data = await res.json();
+    const ms = Math.round(performance.now() - t0);
+    out.textContent = JSON.stringify(data, null, 2);
+    if(!res.ok){
+      return fail(`HTTP ${res.status}${data && data.message ? ' · ' + data.message : ''}`);
+    }
+    const total = res.headers.get('x-wp-total');
+    const shown = Array.isArray(data) ? `${data.length} item${data.length === 1 ? '' : 's'} shown` : 'single object';
+    st.innerHTML = `<span class="font-medium text-emerald-700"><i class="fa-solid fa-circle-check mr-1.5"></i>Live response · ${res.status}</span>
+      <span>${ms} ms</span><span>${shown}</span>
+      ${total ? `<span>Total on the site: <strong class="text-ink">${esc(total)}</strong></span>` : ''}`;
+  } catch(e){
+    if(call === R.demo){
+      out.textContent = JSON.stringify(R.snapshot, null, 2);
+      st.innerHTML = `<span class="font-medium text-amber-700"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i>Live request failed (${esc(e.message)}). Showing a saved snapshot instead.</span>`;
+    } else {
+      out.textContent = '';
+      fail(`Live request failed (${e.message}).`);
+    }
+  }
+}
+
+function spy(){
+  const links = [...document.querySelectorAll('#toc a')];
+  const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if(e.isIntersecting){ links.forEach(l => l.classList.remove('nav-on')); map.get(e.target.id)?.classList.add('nav-on'); }
+  }), { rootMargin:'-20% 0px -70% 0px' });
+  map.forEach((_, id) => { const el = document.getElementById(id); if(el) io.observe(el); });
+}
+
+boot();
+</script>
+</body>
+</html>

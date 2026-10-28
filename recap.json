@@ -1,0 +1,448 @@
+{
+  "meta": {
+    "title": "Digital Exhibition — WordPress & App Recap",
+    "subtitle": "Where the WordPress site and the new Nuxt application stand, what we are waiting for, and how the pieces fit together",
+    "client": "TU/e — Built Environment, Digital Exhibition platform",
+    "author": "marco@tech-paw.com",
+    "updated": "2026-10-28",
+    "scope": "Staging / local only for now — nothing described here has been pushed to the live server."
+  },
+  "tldr": [
+    "The live WordPress site is unchanged apart from a few plugins added or removed. All the new work sits on staging / localhost.",
+    "The new front-end is a Nuxt application on Cloudflare. It reads pages from the WordPress REST API and shows them in a new layout, so WordPress stays the place where editors work. We still need to decide where the web app (Nuxt) is going to live.",
+    "Images come from one shared bucket for live, staging and the app (16.5 GB), instead of three copies.",
+    "Before we go live we need: a decision on hosting (Cloudflare or somewhere else), approval of staging, confirmation of the SEO set-up, an email service, and testing of desktop, mobile and forms (most of these parts have already been tested)."
+  ],
+  "domains": [
+    {
+      "id": "live",
+      "icon": "fa-globe",
+      "label": "WordPress — live",
+      "url": "https://digitalexhibition.arch.tue.nl/",
+      "role": "Current public website. Content unchanged apart from a few plugin changes.",
+      "badge": "Live",
+      "tone": "emerald"
+    },
+    {
+      "id": "staging",
+      "icon": "fa-flask",
+      "label": "WordPress — staging",
+      "url": "https://staging.digitalexhibition.arch.tue.nl/",
+      "role": "Where the changes are tested. It carries every modification that will move to live.",
+      "badge": "Needs approval",
+      "tone": "amber"
+    },
+    {
+      "id": "app",
+      "icon": "fa-cloud",
+      "label": "Nuxt application — Cloudflare",
+      "url": "https://digitalexhibition.marco-977.workers.dev/",
+      "role": "The new front-end. Reads the WordPress REST API and shows the pages in a new layout.",
+      "badge": "Preview",
+      "tone": "sky"
+    },
+    {
+      "id": "gh-wp",
+      "icon": "fa-brands fa-github",
+      "label": "GitHub — WordPress repository",
+      "url": "https://github.com/orso081980/digitalexhibition-backend",
+      "role": "Version control for the WordPress back end (wp-content).",
+      "badge": "Public",
+      "tone": "neutral"
+    },
+    {
+      "id": "gh-nuxt",
+      "icon": "fa-brands fa-github",
+      "label": "GitHub — Nuxt repository",
+      "url": "https://github.com/orso081980/digitalexhibition",
+      "role": "Source of the new front-end application.",
+      "badge": "Private",
+      "tone": "neutral"
+    },
+    {
+      "id": "r2",
+      "icon": "fa-bucket",
+      "label": "Cloudflare R2 — media bucket",
+      "url": "https://pub-16f8e6dfcd9345b58d35a2cfaa84e205.r2.dev",
+      "role": "Holds every image and PDF (16.5 GB). The address is temporary and is meant to be replaced by a proper domain.",
+      "badge": "Temporary URL",
+      "tone": "amber",
+      "linkable": false
+    }
+  ],
+  "targetDomains": [
+    {
+      "host": "digitalexhibition.arch.tue.nl",
+      "serves": "The Nuxt application — what visitors see",
+      "icon": "fa-cloud",
+      "tone": "sky"
+    },
+    {
+      "host": "live.digitalexhibition.arch.tue.nl",
+      "serves": "WordPress live — editors work here and feed the app",
+      "icon": "fa-globe",
+      "tone": "emerald"
+    },
+    {
+      "host": "staging.digitalexhibition.arch.tue.nl",
+      "serves": "WordPress staging — testing and emergency replica",
+      "icon": "fa-flask",
+      "tone": "amber"
+    }
+  ],
+  "actions": [
+    {
+      "id": "A1",
+      "icon": "fa-envelope",
+      "title": "Email system",
+      "detail": "Password reset and the contact form need a working mail service. Brevo is the proposed option (free plan: 300 emails per day) as an alternative to Microsoft Graph via Azure. WP Mail SMTP on WordPress and the contact endpoint in the app both connect to it.",
+      "waitingOn": "TU/e",
+      "ask": "Choose Brevo or Microsoft Graph, so the sender domain can be set up.",
+      "status": "waiting"
+    },
+    {
+      "id": "A2",
+      "icon": "fa-magnifying-glass-chart",
+      "title": "SEO optimisation",
+      "detail": "On WordPress, SEO is handled by Yoast and the data is essential. In the app SEO is more complete and many pages carry sensible defaults. Indexing stays switched off until go-live.",
+      "waitingOn": "TU/e",
+      "ask": "Confirm the app's SEO approach is acceptable.",
+      "status": "waiting"
+    },
+    {
+      "id": "A3",
+      "icon": "fa-flask",
+      "title": "Approve the staging website",
+      "detail": "Two databases exist, staging and production. They are not synchronised, but both are up to date. Staging holds the new admin experience.",
+      "waitingOn": "Deniz",
+      "ask": "Log in to the new back end, review it and confirm, so the final transfer can start.",
+      "status": "waiting"
+    },
+    {
+      "id": "A4",
+      "icon": "fa-server",
+      "title": "Decide the hosting",
+      "detail": "Where the web application (Nuxt on Cloudflare) and the bucket (R2?) will live. Jonathan suggests Bunny.net.",
+      "waitingOn": "Jonathan / TU/e",
+      "ask": "Decide the hosting for the app and the bucket.",
+      "status": "waiting"
+    },
+    {
+      "id": "A5",
+      "icon": "fa-code-merge",
+      "title": "Merge staging and turn it into production",
+      "detail": "The live site has barely changed (a few plugins added or removed). Once both repositories are merged, live becomes a copy of staging and the database is adapted, with a few changes made either on staging or through code.",
+      "waitingOn": "Marco",
+      "ask": "Starts after A3 (approval) and A4 (hosting).",
+      "status": "ours"
+    },
+    {
+      "id": "A6",
+      "icon": "fa-vial-circle-check",
+      "title": "Tests before going live",
+      "detail": "Most parts have already been tested. Before the domain is transferred, the application gets a final check on desktop and mobile, including the forms. On WordPress, the new admin UX/UI gets manual and automated testing.",
+      "waitingOn": "Marco (app) · Deniz (WordPress)",
+      "ask": "Manual and automated testing of the new WordPress interface.",
+      "status": "waiting"
+    },
+    {
+      "id": "A7",
+      "icon": "fa-plug",
+      "title": "Plugins and Flask",
+      "detail": "We need to know whether Flask has any connection to WordPress through the various plugins.",
+      "waitingOn": "TU/e IT",
+      "ask": "Confirm whether any plugin depends on a connection with Flask.",
+      "status": "waiting"
+    }
+  ],
+  "plugins": [
+    {
+      "icon": "fa-folder-tree",
+      "name": "Figuro Folders",
+      "does": "Media library folders. It replaces FileBird Pro; the folders and files were imported from FileBird (438 folders, 3,943 files in the latest import).",
+      "kind": "Replaces a plugin"
+    },
+    {
+      "icon": "fa-vector-square",
+      "name": "SVG Support",
+      "does": "Allows SVG uploads such as logos and other vector images.",
+      "kind": "New"
+    },
+    {
+      "icon": "fa-cloud-arrow-up",
+      "name": "Advanced Media Offloader",
+      "does": "Sends uploads to the Cloudflare R2 bucket so live, staging and the app share one copy of every image.",
+      "kind": "New"
+    },
+    {
+      "icon": "fa-clock-rotate-left",
+      "name": "Activity Log",
+      "does": "Records who changed what in the WordPress admin.",
+      "kind": "New"
+    },
+    {
+      "icon": "fa-paper-plane",
+      "name": "WP Mail SMTP",
+      "does": "Will be connected to the email service, so password resets and form mails are delivered.",
+      "kind": "To connect"
+    },
+    {
+      "icon": "fa-rocket",
+      "name": "Cloudflare Deploy Trigger",
+      "does": "A “Deploy Frontend” button. Editors write their pages, then press it once to publish them in the app. This saves API calls and avoids extra cost.",
+      "kind": "New"
+    }
+  ],
+  "environments": [
+    {
+      "icon": "fa-vial",
+      "title": "Test new features",
+      "text": "Try changes on the WordPress site before they reach the live site."
+    },
+    {
+      "icon": "fa-life-ring",
+      "title": "Emergency replica",
+      "text": "If something goes wrong, staging can copy the live environment to reproduce and find errors."
+    }
+  ],
+  "email": {
+    "title": "Brevo as the email service",
+    "text": "Brevo is an alternative to Microsoft Graph via Azure. Its free plan allows 300 emails per day, which is enough for password resets and the contact form.",
+    "url": "https://www.brevo.com/pricing/see-all-features/",
+    "urlLabel": "Brevo plans and membership"
+  },
+  "storage": {
+    "before": [
+      {
+        "label": "Flask server (TU/e) — live",
+        "size": "16.5 GB"
+      },
+      {
+        "label": "Flask server (TU/e) — staging copy",
+        "size": "16.5 GB"
+      },
+      {
+        "label": "Cloudflare R2",
+        "size": "16.5 GB"
+      }
+    ],
+    "after": {
+      "label": "One Cloudflare R2 bucket",
+      "size": "16.5 GB"
+    },
+    "users": [
+      "WordPress live",
+      "WordPress staging",
+      "Nuxt application"
+    ]
+  },
+  "rest": {
+    "base": "https://digitalexhibition.arch.tue.nl/wp-json/wp/v2/",
+    "root": "https://digitalexhibition.arch.tue.nl/wp-json/",
+    "demo": "wp/v2/pages?per_page=3&_fields=id,slug,link,modified,title,parent",
+    "presets": [
+      {
+        "label": "Pages",
+        "call": "wp/v2/pages?per_page=3&_fields=id,slug,link,modified,title,parent"
+      },
+      {
+        "label": "Posts",
+        "call": "wp/v2/posts?per_page=3&_fields=id,slug,link,date,title"
+      },
+      {
+        "label": "Courses",
+        "call": "wp/v2/courses?per_page=3&_fields=id,slug,link,title"
+      },
+      {
+        "label": "Seminars",
+        "call": "wp/v2/seminars?per_page=3&_fields=id,slug,link,title"
+      },
+      {
+        "label": "Archiprix",
+        "call": "wp/v2/archiprix?per_page=3&_fields=id,slug,link,title"
+      },
+      {
+        "label": "Media",
+        "call": "wp/v2/media?per_page=3&_fields=id,slug,source_url,mime_type"
+      },
+      {
+        "label": "One page by slug",
+        "call": "wp/v2/pages?slug=contact&_fields=id,slug,link,title,yoast_head_json.title"
+      }
+    ],
+    "endpoints": [
+      {
+        "path": "/pages",
+        "kind": "Pages",
+        "total": 14,
+        "usedFor": "Home, archive landings, Contact, Newsletter, Privacy"
+      },
+      {
+        "path": "/posts",
+        "kind": "News / projects",
+        "total": 67,
+        "usedFor": "News feed and project entries"
+      },
+      {
+        "path": "/courses",
+        "kind": "Courses",
+        "total": 60,
+        "usedFor": "Course archive and course pages"
+      },
+      {
+        "path": "/seminars",
+        "kind": "Seminars",
+        "total": 6,
+        "usedFor": "Seminar pages"
+      },
+      {
+        "path": "/archiprix",
+        "kind": "Archiprix",
+        "total": 20,
+        "usedFor": "Archiprix entries"
+      },
+      {
+        "path": "/media",
+        "kind": "Media",
+        "total": 4101,
+        "usedFor": "Image and PDF records (files live in R2)"
+      }
+    ],
+    "snapshot": [
+      {
+        "id": 20430,
+        "modified": "2026-09-03T14:31:34",
+        "slug": "privacy-policy",
+        "link": "https://digitalexhibition.arch.tue.nl/privacy-policy/",
+        "title": {
+          "rendered": "Privacy Policy"
+        },
+        "parent": 0
+      },
+      {
+        "id": 4750,
+        "modified": "2021-12-26T13:20:42",
+        "slug": "newsletter",
+        "link": "https://digitalexhibition.arch.tue.nl/newsletter/",
+        "title": {
+          "rendered": "Newsletter"
+        },
+        "parent": 0
+      },
+      {
+        "id": 967,
+        "modified": "2026-03-18T20:14:50",
+        "slug": "bachelor-projects",
+        "link": "https://digitalexhibition.arch.tue.nl/projects/bachelor-projects/",
+        "title": {
+          "rendered": "Bachelor Projects"
+        },
+        "parent": 938
+      }
+    ],
+    "fields": [
+      {
+        "field": "title.rendered",
+        "icon": "fa-heading",
+        "use": "Page heading and menu labels"
+      },
+      {
+        "field": "content.rendered",
+        "icon": "fa-align-left",
+        "use": "Body content, shown in the new layout"
+      },
+      {
+        "field": "yoast_head_json",
+        "icon": "fa-magnifying-glass",
+        "use": "Titles, descriptions and share images for SEO"
+      },
+      {
+        "field": "featured_media",
+        "icon": "fa-image",
+        "use": "Hero and card images, served from the R2 bucket"
+      },
+      {
+        "field": "acf",
+        "icon": "fa-sliders",
+        "use": "Custom fields such as the PDF attached to an entry"
+      }
+    ],
+    "pagesNote": "The 14 pages returned by /pages are what the app uses to build its page routes. Entries from courses, seminars, archiprix and posts add roughly 150 more routes."
+  },
+  "screenshots": [
+    {
+      "id": "admin",
+      "title": "WordPress admin UI",
+      "caption": "The localhost dashboard with the new admin interface: Quick Actions, the Deploy Frontend button in the top bar, and the new menu entries.",
+      "src": "screenshots/recap/admin-ui.png"
+    },
+    {
+      "id": "figuro",
+      "title": "Figuro Folders (media)",
+      "caption": "Folder-based media library. It replaces FileBird Pro, and the import banner shows 438 folders and 3,943 files carried over.",
+      "src": "screenshots/recap/figuro-folders.png"
+    },
+    {
+      "id": "activity",
+      "title": "Activity Log",
+      "caption": "A record of who changed what in the admin: logins, theme and plugin updates, media changes. Cropped to the latest entries.",
+      "src": "screenshots/recap/activity-log.png"
+    },
+    {
+      "id": "offloader",
+      "title": "Advanced Media Offloader",
+      "caption": "New uploads are sent to the shared Cloudflare R2 bucket. Local copies are removed once the cloud copy exists.",
+      "src": "screenshots/recap/media-offloader.png"
+    },
+    {
+      "id": "deploy",
+      "title": "Deploy Frontend",
+      "caption": "The Deploy Frontend button in the top bar publishes new pages to the application. The hook URL is set once under Settings → Deploy Frontend.",
+      "src": "screenshots/recap/deploy-frontend.png"
+    }
+  ],
+  "postmortem": {
+    "title": "Post-mortem — the theme update that broke the front-end",
+    "summary": "Automatic updates on the Flask server updated the WordPress theme. Because the theme had no child theme, the update replaced it completely with the files from the WordPress repository, which broke the theme and the WordPress front-end design.",
+    "chain": [
+      {
+        "icon": "fa-arrows-rotate",
+        "label": "Automatic update",
+        "text": "Flask runs automatic updates for WordPress."
+      },
+      {
+        "icon": "fa-palette",
+        "label": "Theme updated",
+        "text": "The theme was set up without a child theme, so it updates as a whole."
+      },
+      {
+        "icon": "fa-cloud-arrow-down",
+        "label": "Files overwritten",
+        "text": "The update downloads the files from the WordPress repository over the customised ones."
+      },
+      {
+        "icon": "fa-burst",
+        "label": "Front-end broken",
+        "text": "The theme and the WordPress front-end design stop working."
+      }
+    ],
+    "now": {
+      "title": "Where we are now",
+      "points": [
+        {
+          "icon": "fa-toggle-off",
+          "text": "Switching auto-update off in WordPress was not enough: the theme still updated."
+        },
+        {
+          "icon": "fa-signature",
+          "text": "On the live site we changed the theme name, to avoid the auto-update."
+        },
+        {
+          "icon": "fa-palette",
+          "text": "The theme is maintained as it was in the previous version. Only its name changed, so the design and files stay the same."
+        }
+      ],
+      "question": "Was auto-update switched off only after the update had already happened? TU/e IT can confirm the order of events."
+    }
+  }
+}
