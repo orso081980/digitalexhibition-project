@@ -239,7 +239,7 @@
   "rest": {
     "base": "https://digitalexhibition.arch.tue.nl/wp-json/wp/v2/",
     "root": "https://digitalexhibition.arch.tue.nl/wp-json/",
-    "demo": "wp/v2/pages?per_page=3&_fields=id,slug,link,modified,title,parent",
+    "demo": "wp/v2/pages?per_page=5&_fields=id,slug,link,modified,title,parent,content",
     "presets": [
       {
         "label": "Pages",
@@ -275,37 +275,43 @@
         "path": "/pages",
         "kind": "Pages",
         "total": 14,
-        "usedFor": "Home, archive landings, Contact, Newsletter, Privacy"
+        "usedFor": "Home, archive landings, Contact, Newsletter, Privacy",
+        "call": "wp/v2/pages?per_page=3&_fields=id,slug,link,modified,title,parent"
       },
       {
         "path": "/posts",
         "kind": "News / projects",
         "total": 67,
-        "usedFor": "News feed and project entries"
+        "usedFor": "News feed and project entries",
+        "call": "wp/v2/posts?per_page=3&_fields=id,slug,link,date,title"
       },
       {
         "path": "/courses",
         "kind": "Courses",
         "total": 60,
-        "usedFor": "Course archive and course pages"
+        "usedFor": "Course archive and course pages",
+        "call": "wp/v2/courses?per_page=3&_fields=id,slug,link,title"
       },
       {
         "path": "/seminars",
         "kind": "Seminars",
         "total": 6,
-        "usedFor": "Seminar pages"
+        "usedFor": "Seminar pages",
+        "call": "wp/v2/seminars?per_page=3&_fields=id,slug,link,title"
       },
       {
         "path": "/archiprix",
         "kind": "Archiprix",
         "total": 20,
-        "usedFor": "Archiprix entries"
+        "usedFor": "Archiprix entries",
+        "call": "wp/v2/archiprix?per_page=3&_fields=id,slug,link,title"
       },
       {
         "path": "/media",
         "kind": "Media",
         "total": 4101,
-        "usedFor": "Image and PDF records (files live in R2)"
+        "usedFor": "Image and PDF records (files live in R2)",
+        "call": "wp/v2/media?per_page=3&_fields=id,slug,source_url,mime_type"
       }
     ],
     "snapshot": [

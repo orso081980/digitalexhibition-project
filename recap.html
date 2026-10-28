@@ -248,7 +248,7 @@ tailwind.config = {
         <button id="rest-run" type="submit" class="no-print inline-flex w-fit shrink-0 items-center gap-1.5 rounded-md bg-ink px-3 py-1.5 text-[12px] font-medium text-white transition hover:bg-neutral-700"><i class="fa-solid fa-play"></i>Run request</button>
       </form>
       <div id="rest-status" class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-line px-4 py-2 text-[12px] text-mute"></div>
-      <pre id="rest-out" class="max-h-[340px] overflow-auto bg-[#16181d] p-4 font-mono text-[12px] leading-5 text-neutral-200"></pre>
+      <div id="rest-out" class="max-h-[480px] overflow-y-auto overflow-x-hidden bg-[#16181d] p-4 font-mono text-[12px] leading-5 text-neutral-200"></div>
     </div>
 
     <div class="mt-8 grid gap-6 lg:grid-cols-2">
@@ -478,11 +478,21 @@ function render(D){
     </li>`).join('');
 
   const R = D.rest;
-  $('endpoint-rows').innerHTML = R.endpoints.map(e => `
+  $('endpoint-rows').innerHTML = R.endpoints.map(e => {
+    const url = R.root + e.call;
+    return `
     <tr>
-      <td class="px-4 py-2.5"><code class="text-[12px] text-ink">${esc(e.path)}</code><div class="text-[12px] text-mute">${esc(e.usedFor)}</div></td>
-      <td class="px-4 py-2.5 text-right font-medium tabular-nums">${e.total.toLocaleString('en-US')}</td>
-    </tr>`).join('');
+      <td class="px-4 py-2.5">
+        <a href="${esc(url)}" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center gap-1.5 text-ink hover:text-accentink">
+          <code class="text-[12px] font-medium">${esc(e.path)}</code>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-neutral-400 group-hover:text-accentink"></i>
+        </a>
+        <div class="text-[12px] text-mute">${esc(e.usedFor)}</div>
+        <a href="${esc(url)}" target="_blank" rel="noopener noreferrer" class="mt-1 block break-all font-mono text-[11px] leading-4 text-neutral-500 hover:text-accentink hover:underline">${esc(url)}</a>
+      </td>
+      <td class="px-4 py-2.5 text-right align-top font-medium tabular-nums">${e.total.toLocaleString('en-US')}</td>
+    </tr>`;
+  }).join('');
   $('pages-note').textContent = R.pagesNote;
   $('field-list').innerHTML = R.fields.map(f => `
     <li class="flex gap-3 rounded-lg border border-line px-3.5 py-2.5">
@@ -540,8 +550,17 @@ function initRest(R){
   runRest(R);
 }
 
+// Wrap long lines instead of scrolling sideways: each wrapped line is indented
+// 4ch deeper than the line it continues, so the JSON structure stays readable.
+function showOut(text){
+  $('rest-out').innerHTML = text.split('\n').map(line => {
+    const n = line.length - line.trimStart().length;
+    return `<div style="padding-left:${n + 4}ch;text-indent:-4ch;white-space:pre-wrap;overflow-wrap:anywhere">${esc(line.trimStart())}</div>`;
+  }).join('');
+}
+
 async function runRest(R){
-  const out = $('rest-out'), st = $('rest-status');
+  const st = $('rest-status');
   const call = $('rest-call').value.trim().replace(/^\/+/, '');
   const fail = msg => {
     st.innerHTML = `<span class="font-medium text-red-700"><i class="fa-solid fa-circle-xmark mr-1.5"></i>${esc(msg)}</span>`;
@@ -549,17 +568,17 @@ async function runRest(R){
 
   // Stay on the live WordPress REST root: the box only edits what follows it.
   let target;
-  try { target = new URL(call, R.root); } catch(e){ out.textContent = ''; return fail('That is not a valid request.'); }
-  if(!target.href.startsWith(R.root)){ out.textContent = ''; return fail('Requests are limited to ' + R.root); }
+  try { target = new URL(call, R.root); } catch(e){ showOut(''); return fail('That is not a valid request.'); }
+  if(!target.href.startsWith(R.root)){ showOut(''); return fail('Requests are limited to ' + R.root); }
 
-  out.textContent = 'Loading…';
+  showOut('Loading…');
   st.innerHTML = '<span><i class="fa-solid fa-spinner fa-spin mr-1.5"></i>Calling the live API…</span>';
   try {
     const t0 = performance.now();
     const res = await fetch(target.href, { headers:{ Accept:'application/json' } });
     const data = await res.json();
     const ms = Math.round(performance.now() - t0);
-    out.textContent = JSON.stringify(data, null, 2);
+    showOut(JSON.stringify(data, null, 2));
     if(!res.ok){
       return fail(`HTTP ${res.status}${data && data.message ? ' · ' + data.message : ''}`);
     }
@@ -570,10 +589,10 @@ async function runRest(R){
       ${total ? `<span>Total on the site: <strong class="text-ink">${esc(total)}</strong></span>` : ''}`;
   } catch(e){
     if(call === R.demo){
-      out.textContent = JSON.stringify(R.snapshot, null, 2);
+      showOut(JSON.stringify(R.snapshot, null, 2));
       st.innerHTML = `<span class="font-medium text-amber-700"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i>Live request failed (${esc(e.message)}). Showing a saved snapshot instead.</span>`;
     } else {
-      out.textContent = '';
+      showOut('');
       fail(`Live request failed (${e.message}).`);
     }
   }
