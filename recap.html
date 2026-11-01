@@ -67,6 +67,7 @@ tailwind.config = {
         <a href="#rest" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">REST API &amp; Jamstack</a>
         <a href="#media" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">Shared media bucket</a>
         <a href="#postmortem" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">Post-mortem</a>
+        <a href="#firewall" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">Firewall</a>
       </nav>
       <dl id="docmeta" class="mt-8 space-y-2 border-t border-line pt-6 text-[12px] text-mute"></dl>
     </div>
@@ -302,6 +303,18 @@ tailwind.config = {
     </div>
     <p id="pm-summary" class="max-w-3xl text-[15px] leading-7 text-neutral-600"></p>
     <ol id="pm-chain" class="mt-6 grid gap-3 md:grid-cols-4"></ol>
+    <!-- Firewall -->
+    <div class="mb-6 mt-16">
+      <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">Findings</p>
+      <h2 id="firewall" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">Firewall</h2>
+    </div>
+    <p id="dc-summary" class="max-w-3xl text-[15px] leading-7 text-neutral-600"></p>
+    <div id="dc-modes" class="mt-6 grid gap-3 md:grid-cols-2"></div>
+    <div id="dc-did" class="mt-3 flex gap-3 rounded-xl border border-emerald-200 bg-emerald-50/40 p-4"></div>
+    <h3 id="dc-options-title" class="mt-10 text-[15px] font-semibold"></h3>
+    <div id="dc-options" class="mt-4 grid gap-3 md:grid-cols-3"></div>
+    <p class="mt-5 text-[12.5px] text-mute"><span id="dc-path-label"></span>: <code id="dc-path" class="rounded bg-panel px-1.5 py-0.5 font-mono text-[12px] text-neutral-700 ring-1 ring-inset ring-line"></code></p>
+
     <footer class="mt-20 border-t border-line pt-6 text-[12px] text-mute">
       Part of the migration documentation · see also
       <a class="text-accentink hover:underline" href="index.html">Migration plan</a> and
@@ -517,6 +530,32 @@ function render(D){
 
   const P = D.postmortem;
   $('pm-summary').textContent = P.summary;
+  const DC = D.discovery;
+  $('dc-summary').textContent = DC.summary;
+  $('dc-modes').innerHTML = DC.modes.map(m => {
+    const [badge, ico] = TONE[m.tone] || TONE.neutral;
+    return `
+    <div class="avoid-break rounded-xl border border-line p-5">
+      <div class="flex items-center justify-between gap-3">
+        <span class="flex items-center gap-2 text-[14px] font-semibold"><i class="fa-solid ${m.icon} ${ico}"></i>${esc(m.label)}</span>
+        <span class="rounded px-1.5 py-0.5 text-[10.5px] font-semibold ring-1 ring-inset ${badge}">${esc(m.mode)}</span>
+      </div>
+      <p class="mt-2 text-[13px] leading-6 text-neutral-600">${esc(m.text)}</p>
+    </div>`;
+  }).join('');
+  $('dc-did').innerHTML = `<i class="fa-solid fa-circle-check mt-0.5 text-emerald-600"></i>
+    <div><p class="text-[10px] font-semibold uppercase tracking-wide text-emerald-700">What we did</p>
+    <p class="mt-0.5 text-[13.5px] leading-6 text-neutral-700">${esc(DC.did)}</p></div>`;
+  $('dc-options-title').textContent = DC.optionsTitle;
+  $('dc-options').innerHTML = DC.options.map(o => `
+    <div class="avoid-break rounded-xl border ${o.current ? 'border-emerald-200 bg-emerald-50/40' : 'border-line'} p-4">
+      <div class="flex items-center justify-between"><i class="fa-solid ${o.icon} text-neutral-500"></i>${o.current ? '<span class="rounded bg-emerald-100 px-1.5 py-0.5 text-[10.5px] font-semibold text-emerald-800">Current</span>' : ''}</div>
+      <h4 class="mt-3 text-[13.5px] font-semibold">${esc(o.title)}</h4>
+      <p class="mt-1 text-[12.5px] leading-5 text-neutral-600">${esc(o.text)}</p>
+    </div>`).join('');
+  $('dc-path-label').textContent = DC.pathLabel;
+  $('dc-path').textContent = DC.path;
+
   $('pm-chain').innerHTML = P.chain.map((c,i) => `
     <li class="avoid-break relative rounded-xl border ${c.tone === 'bad' ? 'border-red-200 bg-red-50/60' : c.tone === 'good' ? 'border-emerald-200 bg-emerald-50/50' : 'border-line'} p-4">
       <i class="fa-solid ${c.icon} ${c.tone === 'bad' ? 'text-red-600' : c.tone === 'good' ? 'text-emerald-600' : 'text-neutral-500'}"></i>

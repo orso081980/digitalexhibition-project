@@ -431,5 +431,46 @@
       }
     ]
   },
-  "changesIntro": "The live site still has its current content, with only a few plugins added or removed. Staging has had several changes. The files and the database of staging will be merged into the live website, unless more content is added in the meantime."
+  "changesIntro": "The live site still has its current content, with only a few plugins added or removed. Staging has had several changes. The files and the database of staging will be merged into the live website, unless more content is added in the meantime.",
+  "discovery": {
+    "summary": "Within the hosting platform (Flask) we found a web application firewall. Sometimes it made the deployment of the app hard, because it blocked requests that our development and deployment need.",
+    "modes": [
+      {
+        "icon": "fa-flask",
+        "label": "Staging",
+        "mode": "Firewall on",
+        "text": "The firewall is on and blocks what it considers a risk. This is the setting that got in our way.",
+        "tone": "amber"
+      },
+      {
+        "icon": "fa-globe",
+        "label": "Live website",
+        "mode": "Detection only",
+        "text": "The firewall only records what it would block. It blocks nothing.",
+        "tone": "emerald"
+      }
+    ],
+    "did": "For development we added security rule ID 210580 to the firewall settings, so that it no longer blocks our work.",
+    "optionsTitle": "The three ways to handle it",
+    "options": [
+      {
+        "icon": "fa-shield-halved",
+        "title": "Keep the exception",
+        "text": "The firewall stays on and rule 210580 is added to its settings. This is what we do now.",
+        "current": true
+      },
+      {
+        "icon": "fa-power-off",
+        "title": "Switch it off",
+        "text": "The firewall stops filtering requests altogether."
+      },
+      {
+        "icon": "fa-eye",
+        "title": "Detection only",
+        "text": "Like the live website: it records suspicious requests but never blocks them."
+      }
+    ],
+    "pathLabel": "Where to find it in the control panel",
+    "path": "/smb/web-app-firewall/index/id/59"
+  }
 }
