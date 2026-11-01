@@ -41,6 +41,7 @@ tailwind.config = {
     .shadow-card{ box-shadow:none !important; }
   }
 </style>
+<script src="nav.js" defer></script>
 </head>
 <body class="bg-white font-sans text-[15px] leading-relaxed text-ink antialiased">
 
@@ -81,9 +82,10 @@ tailwind.config = {
 <script>
 const STATUS = {
   'done':        ['Done','bg-emerald-50 text-emerald-700 ring-emerald-600/20'],
-  'in-progress': ['In progress','bg-blue-50 text-blue-700 ring-blue-600/20'],
-  'review':      ['Review','bg-amber-50 text-amber-700 ring-amber-600/20'],
-  'blocked':     ['Blocked','bg-red-50 text-red-700 ring-red-600/20'],
+  'in-progress': ['In progress','bg-sky-50 text-sky-700 ring-sky-600/20'],
+  'review':      ['Review','bg-blue-50 text-blue-700 ring-blue-600/20'],
+  'blocked':     ['Waiting','bg-amber-50 text-amber-700 ring-amber-600/20'],
+  'delete':      ['To delete','bg-red-50 text-red-700 ring-red-600/20'],
   'todo':        ['To do','bg-neutral-100 text-neutral-500 ring-neutral-500/20'],
 };
 const PRIO = { P0:'text-red-600', P1:'text-amber-600', P2:'text-neutral-400' };
@@ -110,7 +112,6 @@ const SECTIONS = () => [
   ...DATA.workstreams.map(w => [w.id, `${w.code}. ${w.name}`]),
   ['schedule','Seven-day plan'],
   ['plugins','Plugin audit'],
-  ['decisions','Open decisions'],
   ['architecture','Architecture'],
 ];
 
@@ -126,13 +127,13 @@ function render(){
   const tasks = allTasks();
   const done = tasks.filter(t => t.status === 'done').length;
   const inProg = tasks.filter(t => t.status === 'in-progress').length;
-  const decisionsOpen = (d.decisions||[]).filter(x => x.status === 'open').length;
+  const waiting = tasks.filter(t => t.status === 'blocked').length;
   const pct = Math.round(done / tasks.length * 100);
   const statVal = {
     workstreams: d.workstreams.length,
     tasksTotal: tasks.length,
     tasksDone: `${done}/${tasks.length}`,
-    decisionsOpen,
+    waiting,
   };
 
   document.getElementById('hbar').style.width = pct + '%';
@@ -178,7 +179,7 @@ function render(){
 
     ${h('div','Workstreams')}
     <div class="no-print mb-5 flex flex-wrap gap-1.5" id="filters">
-      ${['all','todo','in-progress','review','blocked','done'].map(f => {
+      ${['all','todo','in-progress','review','blocked','delete','done'].map(f => {
         const label = f === 'all' ? 'All' : (STATUS[f]?.[0] ?? f);
         return `<button data-f="${f}" class="rounded-full px-3 py-1 text-xs font-medium transition ${f===filter?'bg-ink text-white':'bg-panel text-mute ring-1 ring-inset ring-line hover:text-ink'}">${esc(label)}</button>`;
       }).join('')}
@@ -222,20 +223,6 @@ function render(){
         </tbody>
       </table>
     </div>
-
-    ${h('div','Open decisions')}
-    <ol id="decisions" class="grid gap-3 md:grid-cols-2">
-      ${d.decisions.map((x,i) => `
-        <li class="rounded-xl border border-line p-5">
-          <div class="flex items-baseline justify-between gap-3">
-            <span class="font-serif text-lg text-neutral-300">${String(i+1).padStart(2,'0')}</span>
-            <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${x.status==='open'?'bg-red-50 text-red-700':'bg-emerald-50 text-emerald-700'}">${esc(x.status)}</span>
-          </div>
-          <p class="mt-1 font-medium text-ink">${esc(x.question)}</p>
-          <p class="mt-2 text-[13px] leading-6 text-neutral-600"><span class="font-medium text-ink">Recommendation. </span>${esc(x.recommendation)}</p>
-          <p class="mt-2 text-[11px] uppercase tracking-wide text-neutral-400">Impacts ${x.impacts.map(esc).join(' · ')}</p>
-        </li>`).join('')}
-    </ol>
 
     ${h('div','Architecture')}
     <div id="architecture" class="grid gap-3">
@@ -296,7 +283,8 @@ const nodeLabel = id => (DATA.architecture.nodes.find(n => n.id === id)||{}).lab
 function decisionColor(dec){
   const s = dec.toUpperCase();
   if(s.startsWith('KEEP')) return 'text-emerald-700';
-  if(s.startsWith('REMOVE')) return 'text-red-600';
+  if(s.startsWith('REMOVE') || s.startsWith('DELETED')) return 'text-red-600';
+  if(s.startsWith('WAITING')) return 'text-amber-600';
   if(s.startsWith('REPLACE') || s === 'RECONFIGURE') return 'text-amber-600';
   if(s.startsWith('REVIEW') || s.startsWith('DONE')) return 'text-blue-600';
   return 'text-neutral-400';

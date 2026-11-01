@@ -4,14 +4,14 @@
     "subtitle": "Where the WordPress site and the new Nuxt application stand, what we are waiting for, and how the pieces fit together",
     "client": "TU/e — Built Environment, Digital Exhibition platform",
     "author": "marco@tech-paw.com",
-    "updated": "2026-10-28",
+    "updated": "2026-11-01",
     "scope": "Staging / local only for now — nothing described here has been pushed to the live server."
   },
   "tldr": [
-    "The live WordPress site is unchanged apart from a few plugins added or removed. All the new work sits on staging / localhost.",
+    "The live WordPress site is unchanged apart from a few plugins added or removed. All the new work sits on staging / localhost. The plan is that after 6 November the current staging files will be merged with live.",
     "The new front-end is a Nuxt application on Cloudflare. It reads pages from the WordPress REST API and shows them in a new layout, so WordPress stays the place where editors work. We still need to decide where the web app (Nuxt) is going to live.",
-    "Images come from one shared bucket for live, staging and the app (16.5 GB), instead of three copies.",
-    "Before we go live we need: a decision on hosting (Cloudflare or somewhere else), approval of staging, confirmation of the SEO set-up, an email service, and testing of desktop, mobile and forms (most of these parts have already been tested)."
+    "Images come from one shared bucket for live, staging and the app (16.5 GB), instead of three copies. The staging uploads folder was deleted, so staging now relies only on the R2 bucket. For now, live keeps a duplicate of the uploaded images.",
+    "Before we go live we need: a decision on hosting (Cloudflare or somewhere else), approval of the latest staging, an email service, and testing of desktop, mobile and forms (most of these parts have already been tested). SEO is not a priority, but we will check which analytics and tracking tools we have or need."
   ],
   "domains": [
     {
@@ -103,20 +103,20 @@
     {
       "id": "A2",
       "icon": "fa-magnifying-glass-chart",
-      "title": "SEO optimisation",
-      "detail": "On WordPress, SEO is handled by Yoast and the data is essential. In the app SEO is more complete and many pages carry sensible defaults. Indexing stays switched off until go-live.",
-      "waitingOn": "TU/e",
-      "ask": "Confirm the app's SEO approach is acceptable.",
-      "status": "waiting"
+      "title": "To investigate: analytics & tracking",
+      "detail": "SEO is not a priority. What we do want to know is which of these tools the site has today, or needs: Google Analytics, Google Search Console, Google Tag Manager and a cookie script.",
+      "waitingOn": "Marco, with TU/e",
+      "ask": "Find out which of these are in use today and which are wanted.",
+      "status": "investigate"
     },
     {
       "id": "A3",
       "icon": "fa-flask",
-      "title": "Approve the staging website",
-      "detail": "Two databases exist, staging and production. They are not synchronised, but both are up to date. Staging holds the new admin experience.",
+      "title": "Approve the latest staging website",
+      "detail": "Staging was updated after the last meeting (notes of 2026-10-29 and the back-end and front-end changes up to 1 November). It now has: the renamed theme, media served only from the R2 bucket, a site-settings endpoint the app reads for logos, menus and footer, a Deploy Frontend button that follows the build until it is live, and video support in the media library. The staging and production databases are not synchronised, but both are up to date.",
       "waitingOn": "Deniz",
-      "ask": "Log in to the new back end, review it and confirm, so the final transfer can start.",
-      "status": "waiting"
+      "ask": "Log in to the latest staging, review it and confirm, so the merge after 6 November can go ahead.",
+      "status": "review"
     },
     {
       "id": "A4",
@@ -131,28 +131,19 @@
       "id": "A5",
       "icon": "fa-code-merge",
       "title": "Merge staging and turn it into production",
-      "detail": "The live site has barely changed (a few plugins added or removed). Once both repositories are merged, live becomes a copy of staging and the database is adapted, with a few changes made either on staging or through code.",
+      "detail": "The live site has barely changed (a few plugins added or removed). The files and the database of staging will be merged into live, unless more content is added in the meantime.",
       "waitingOn": "Marco",
-      "ask": "Starts after A3 (approval) and A4 (hosting).",
-      "status": "ours"
+      "ask": "Planned after 6 November, once staging is approved (A3) and the hosting is decided (A4).",
+      "status": "todo"
     },
     {
       "id": "A6",
       "icon": "fa-vial-circle-check",
       "title": "Tests before going live",
-      "detail": "Most parts have already been tested. Before the domain is transferred, the application gets a final check on desktop and mobile, including the forms. On WordPress, the new admin UX/UI gets manual and automated testing.",
+      "detail": "Most parts have already been tested. Once the WordPress live site has been updated, the application gets a final check on desktop and mobile, including the forms. On WordPress, the new admin UX/UI gets manual and automated testing.",
       "waitingOn": "Marco (app) · Deniz (WordPress)",
-      "ask": "Manual and automated testing of the new WordPress interface.",
-      "status": "waiting"
-    },
-    {
-      "id": "A7",
-      "icon": "fa-plug",
-      "title": "Plugins and Flask",
-      "detail": "We need to know whether Flask has any connection to WordPress through the various plugins.",
-      "waitingOn": "TU/e IT",
-      "ask": "Confirm whether any plugin depends on a connection with Flask.",
-      "status": "waiting"
+      "ask": "Manual and automated testing of the new WordPress interface, after WordPress live is live.",
+      "status": "todo"
     }
   ],
   "plugins": [
@@ -234,6 +225,11 @@
       "WordPress live",
       "WordPress staging",
       "Nuxt application"
+    ],
+    "afterNotes": [
+      "For now, live keeps a duplicate of its uploaded images.",
+      "The staging uploads folder was deleted, so staging reads only from the R2 bucket.",
+      "A backup of the media folder on the live website (uploads) is kept if needed."
     ]
   },
   "rest": {
@@ -409,46 +405,31 @@
   ],
   "postmortem": {
     "title": "Post-mortem — the theme update that broke the front-end",
-    "summary": "Automatic updates on the Flask server updated the WordPress theme. Because the theme had no child theme, the update replaced it completely with the files from the WordPress repository, which broke the theme and the WordPress front-end design.",
+    "summary": "WordPress updated the site's theme by itself and replaced our files with a different theme. That broke the layout of the WordPress site. We renamed the theme, so it is no longer connected to the WordPress theme repository and this cannot happen again.",
     "chain": [
       {
         "icon": "fa-arrows-rotate",
         "label": "Automatic update",
-        "text": "Flask runs automatic updates for WordPress."
-      },
-      {
-        "icon": "fa-palette",
-        "label": "Theme updated",
-        "text": "The theme was set up without a child theme, so it updates as a whole."
+        "text": "WordPress updated the theme on its own."
       },
       {
         "icon": "fa-cloud-arrow-down",
-        "label": "Files overwritten",
-        "text": "The update downloads the files from the WordPress repository over the customised ones."
+        "label": "Files replaced",
+        "text": "The theme had no child theme, so the update replaced it completely with files from the WordPress theme repository."
       },
       {
         "icon": "fa-burst",
-        "label": "Front-end broken",
-        "text": "The theme and the WordPress front-end design stop working."
+        "label": "Layout broken",
+        "text": "The WordPress front-end design stopped working.",
+        "tone": "bad"
+      },
+      {
+        "icon": "fa-signature",
+        "label": "Theme renamed",
+        "text": "The theme now has its own name, so it is no longer linked to that repository.",
+        "tone": "good"
       }
-    ],
-    "now": {
-      "title": "Where we are now",
-      "points": [
-        {
-          "icon": "fa-toggle-off",
-          "text": "Switching auto-update off in WordPress was not enough: the theme still updated."
-        },
-        {
-          "icon": "fa-signature",
-          "text": "On the live site we changed the theme name, to avoid the auto-update."
-        },
-        {
-          "icon": "fa-palette",
-          "text": "The theme is maintained as it was in the previous version. Only its name changed, so the design and files stay the same."
-        }
-      ],
-      "question": "Was auto-update switched off only after the update had already happened? TU/e IT can confirm the order of events."
-    }
-  }
+    ]
+  },
+  "changesIntro": "The live site still has its current content, with only a few plugins added or removed. Staging has had several changes. The files and the database of staging will be merged into the live website, unless more content is added in the meantime."
 }
