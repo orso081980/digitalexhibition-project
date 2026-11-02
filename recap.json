@@ -399,8 +399,8 @@
     {
       "id": "deploy",
       "title": "Deploy Frontend",
-      "caption": "The Deploy Frontend button in the top bar publishes new pages to the application. The hook URL is set once under Settings → Deploy Frontend.",
-      "src": "screenshots/recap/deploy-frontend.png"
+      "caption": "The Deploy Frontend button in the top bar publishes new pages to the application. The hook URL and the optional Frontend URL are set once under Settings → Deploy Frontend. With the Frontend URL set, a progress notice follows the build until the new version is live.",
+      "src": "screenshots/recap/deploy-frontend.png?v=20261102"
     }
   ],
   "postmortem": {
