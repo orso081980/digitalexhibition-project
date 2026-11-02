@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "Digital Exhibition — WordPress & App Recap",
+    "title": "TU/e Digital Exhibition — WordPress & App Recap",
     "subtitle": "Where the WordPress site and the new Nuxt application stand, what we are waiting for, and how the pieces fit together",
     "client": "TU/e — Built Environment, Digital Exhibition platform",
     "author": "marco@tech-paw.com",
@@ -65,7 +65,7 @@
       "label": "Cloudflare R2 — media bucket",
       "url": "https://pub-16f8e6dfcd9345b58d35a2cfaa84e205.r2.dev",
       "role": "Holds every image and PDF (16.5 GB). The address is temporary and is meant to be replaced by a proper domain.",
-      "badge": "Temporary URL",
+      "badge": "Temporary URL (all the files are accessible, but the root is not for security reasons)",
       "tone": "amber",
       "linkable": false
     }
@@ -235,31 +235,31 @@
   "rest": {
     "base": "https://digitalexhibition.arch.tue.nl/wp-json/wp/v2/",
     "root": "https://digitalexhibition.arch.tue.nl/wp-json/",
-    "demo": "wp/v2/pages?per_page=5&_fields=id,slug,link,modified,title,parent,content",
+    "demo": "wp/v2/pages?per_page=10&_fields=id,slug,link,modified,title,parent,content",
     "presets": [
       {
         "label": "Pages",
-        "call": "wp/v2/pages?per_page=3&_fields=id,slug,link,modified,title,parent"
+        "call": "wp/v2/pages?per_page=10&_fields=id,slug,link,modified,title,parent"
       },
       {
         "label": "Posts",
-        "call": "wp/v2/posts?per_page=3&_fields=id,slug,link,date,title"
+        "call": "wp/v2/posts?per_page=10&_fields=id,slug,link,date,title"
       },
       {
         "label": "Courses",
-        "call": "wp/v2/courses?per_page=3&_fields=id,slug,link,title"
+        "call": "wp/v2/courses?per_page=10&_fields=id,slug,link,title"
       },
       {
         "label": "Seminars",
-        "call": "wp/v2/seminars?per_page=3&_fields=id,slug,link,title"
+        "call": "wp/v2/seminars?per_page=10&_fields=id,slug,link,title"
       },
       {
         "label": "Archiprix",
-        "call": "wp/v2/archiprix?per_page=3&_fields=id,slug,link,title"
+        "call": "wp/v2/archiprix?per_page=10&_fields=id,slug,link,title"
       },
       {
         "label": "Media",
-        "call": "wp/v2/media?per_page=3&_fields=id,slug,source_url,mime_type"
+        "call": "wp/v2/media?per_page=10&_fields=id,slug,source_url,mime_type"
       },
       {
         "label": "One page by slug",
@@ -272,35 +272,35 @@
         "kind": "Pages",
         "total": 14,
         "usedFor": "Home, archive landings, Contact, Newsletter, Privacy",
-        "call": "wp/v2/pages?per_page=3&_fields=id,slug,link,modified,title,parent"
+        "call": "wp/v2/pages?per_page=10&_fields=id,slug,link,modified,title,parent"
       },
       {
         "path": "/posts",
         "kind": "News / projects",
         "total": 67,
         "usedFor": "News feed and project entries",
-        "call": "wp/v2/posts?per_page=3&_fields=id,slug,link,date,title"
+        "call": "wp/v2/posts?per_page=10&_fields=id,slug,link,date,title"
       },
       {
         "path": "/courses",
         "kind": "Courses",
         "total": 60,
         "usedFor": "Course archive and course pages",
-        "call": "wp/v2/courses?per_page=3&_fields=id,slug,link,title"
+        "call": "wp/v2/courses?per_page=10&_fields=id,slug,link,title"
       },
       {
         "path": "/seminars",
         "kind": "Seminars",
         "total": 6,
         "usedFor": "Seminar pages",
-        "call": "wp/v2/seminars?per_page=3&_fields=id,slug,link,title"
+        "call": "wp/v2/seminars?per_page=10&_fields=id,slug,link,title"
       },
       {
         "path": "/archiprix",
         "kind": "Archiprix",
         "total": 20,
         "usedFor": "Archiprix entries",
-        "call": "wp/v2/archiprix?per_page=3&_fields=id,slug,link,title"
+        "call": "wp/v2/archiprix?per_page=10&_fields=id,slug,link,title"
       },
       {
         "path": "/media",
@@ -405,7 +405,7 @@
   ],
   "postmortem": {
     "title": "Post-mortem — the theme update that broke the front-end",
-    "summary": "WordPress updated the site's theme by itself and replaced our files with a different theme. That broke the layout of the WordPress site. We renamed the theme, so it is no longer connected to the WordPress theme repository and this cannot happen again.",
+    "summary": "WordPress updated the site's theme by itself and replaced our files with a different theme. That broke the layout of the WordPress site. We renamed the theme, so it is no longer connected to the WordPress theme repository and this cannot happen again. The theme is now called tue-digital-exhibition, a name that does not exist in the WordPress repository (not automatic download anymore).",
     "chain": [
       {
         "icon": "fa-arrows-rotate",
@@ -426,7 +426,7 @@
       {
         "icon": "fa-signature",
         "label": "Theme renamed",
-        "text": "The theme now has its own name, so it is no longer linked to that repository.",
+        "text": "The theme is now called tue-digital-exhibition, which is not in the WordPress theme repository, so no update can overwrite it.",
         "tone": "good"
       }
     ]

@@ -39,7 +39,7 @@
 
   // The page title is redundant next to a highlighted menu item once there is room for both.
   const sub = bar.querySelector('.text-mute');
-  if (sub && sub.parentElement === bar.children[0]) sub.classList.add('hidden', '2xl:inline');
+  if (sub && bar.children[0].contains(sub)) sub.classList.add('hidden', '2xl:inline');
 
   // Small screens: a second row that scrolls sideways if it has to.
   const row = document.createElement('nav');

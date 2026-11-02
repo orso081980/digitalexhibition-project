@@ -303,15 +303,15 @@
         {
           "id": "3.5",
           "title": "WP Toolkit — used live, important",
-          "status": "review",
+          "status": "done",
           "priority": "P1",
           "day": 2,
-          "notes": "The live site uses WP Toolkit to manage the website and to apply updates and security fixes, so it matters. We need to understand what to do with it when staging is merged into live."
+          "notes": "The live site uses WP Toolkit to manage the website and to apply updates and security fixes, so it matters."
         },
         {
           "id": "3.7",
-          "title": "Comments — delete",
-          "status": "delete",
+          "title": "Comments — Deleted",
+          "status": "done",
           "priority": "P1",
           "day": 3,
           "notes": "To do: delete comments site-wide (switch the setting off and close existing threads). No plugin needed."
@@ -408,10 +408,10 @@
         {
           "id": "4.5",
           "title": "R2 lifecycle / caching / cost check",
-          "status": "in-progress",
+          "status": "done",
           "priority": "P2",
           "day": 7,
-          "notes": "Cache-Control on R2 objects, Cloudflare cache rules, confirm egress stays in free tier, document the re-sync procedure for new uploads."
+          "notes": "Cache-Control on R2 objects, Cloudflare cache rules, confirm the use can stays in free tier, document the re-sync procedure for new uploads."
         }
       ]
     },
@@ -572,14 +572,14 @@
       {
         "plugin": "post-grid-elementor-addon",
         "purpose": "Post Grid Addon for Elementor",
-        "decision": "REVIEW",
-        "action": "Installed locally — confirm live uses it",
-        "note": "Not named in the meeting; confirm before the merge."
+        "decision": "KEEP",
+        "action": "Installed locally/staging",
+        "note": "Heavy dependency from elementor-pro."
       },
       {
         "plugin": "wordpress-seo",
         "purpose": "Yoast SEO meta",
-        "decision": "KEEP (reduced role)",
+        "decision": "KEEP",
         "action": "Keep as the editorial meta store",
         "note": "yoast_head_json is read by the front-end."
       },
@@ -615,7 +615,7 @@
         "plugin": "aryo-activity-log",
         "purpose": "Activity Log — who changed what",
         "decision": "KEEP",
-        "action": "Active on staging; added to live with the merge",
+        "action": "Active on staging and live",
         "note": "Useful for editors and audits."
       },
       {
@@ -623,7 +623,7 @@
         "purpose": "Allows SVG uploads (logos, vectors)",
         "decision": "KEEP",
         "action": "Added to live with the merge",
-        "note": ""
+        "note": "Ability of adding svg images"
       },
       {
         "plugin": "cloudflare-deploy-trigger",
@@ -637,12 +637,12 @@
         "purpose": "Custom wp-admin dashboard, Manage News, site REST endpoint",
         "decision": "KEEP",
         "action": "Our own plugin",
-        "note": "Serves cd/v1/site to the front-end."
+        "note": "Serves cd/v1/site to the front-end and customize the admin dashboard and the theme."
       },
       {
         "plugin": "wp-mail-smtp",
         "purpose": "Route WordPress mail through SMTP",
-        "decision": "WAITING",
+        "decision": "REVIEW",
         "action": "Connect to Brevo or Microsoft Graph",
         "note": "Waiting for TU/e to choose the service."
       },
@@ -650,49 +650,49 @@
         "plugin": "mailin",
         "purpose": "Brevo plugin",
         "decision": "REVIEW",
-        "action": "Installed locally — only needed if Brevo is chosen",
-        "note": "Depends on the email decision."
+        "action": "Installed locally/staging",
+        "note": "Depends on the email decision. Only needed if Brevo is chosen (alternative to wp-mail-smtp)"
       },
       {
         "plugin": "wp-health + InitUmbrella.php",
         "purpose": "WP Umbrella — site monitoring",
         "decision": "WAITING",
-        "action": "Keep until TU/e confirms",
-        "note": "We do not know whether their theme uses it."
+        "action": "Keep until TU/e confirms, if they use it.",
+        "note": "Confidently manage, monitor, secure, and report on all your WordPress sites, from one reliable dashboard built for agencies that grow."
       },
       {
         "plugin": "wp-toolkit (mu-plugin)",
         "purpose": "WP Toolkit — used live to manage the site, updates and security",
-        "decision": "KEEP (live)",
-        "action": "Understand what to do with it at the merge",
-        "note": "Important. Open question for the staging→live merge."
+        "decision": "KEEP",
+        "action": "The plugin is live and on staging",
+        "note": "Check it during the merge if the files matches (files and API keys)."
       },
       {
         "plugin": "duplicate-page",
         "purpose": "Clone posts and pages",
-        "decision": "REVIEW",
-        "action": "Keep if editors use it regularly, else remove",
-        "note": "Editorial convenience only."
+        "decision": "Keep",
+        "action": "Usefull",
+        "note": "To duplicate pages and posts."
       },
       {
         "plugin": "regenerate-thumbnails",
         "purpose": "Rebuild image sizes",
-        "decision": "KEEP (for now)",
-        "action": "Works alongside the media offloader",
-        "note": "Compatibility mu-plugin added."
+        "decision": "Deactivate",
+        "action": "The plugin is live and on staging.",
+        "note": "Not necessary at this stage, could be usefull if theme is changed."
       },
       {
         "plugin": "better-search-replace",
         "purpose": "Database URL search-replace",
-        "decision": "REMOVE after merge",
-        "action": "Needed while staging is merged into live",
+        "decision": "Deactivate",
+        "action": "Needed for database sync",
         "note": "Remove once the merge is done."
       },
       {
         "plugin": "post-type-switcher",
         "purpose": "Change a post's type",
-        "decision": "REMOVE after migration",
-        "action": "Keep only while content is re-typed",
+        "decision": "Keep it",
+        "action": "Keep it if used",
         "note": "Not needed at steady state."
       },
       {
@@ -700,7 +700,7 @@
         "purpose": "Form builder",
         "decision": "DELETED",
         "action": "Deleted",
-        "note": "Forms are handled by the front-end."
+        "note": "Forms are handled by the front-end and elementor."
       }
     ]
   },
