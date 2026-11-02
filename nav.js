@@ -18,6 +18,20 @@
   const bar = header && header.firstElementChild;
   if (!bar) return;
 
+  // The brand (logo, name, page name) is the same on every page and links to the home page.
+  // Each page only supplies its own page name, as the .text-mute span in its header.
+  const pageName = (bar.children[0].querySelector('.text-mute') || {}).innerHTML || '';
+  const brand = document.createElement('a');
+  brand.href = 'index.html';
+  brand.title = 'Digital Exhibition — documentation home';
+  brand.className = 'flex items-center gap-3 transition hover:opacity-80';
+  brand.innerHTML = `<img src="assets/tue-black.svg" alt="TU/e — Eindhoven University of Technology" class="h-5 w-auto">
+    <span class="flex flex-col leading-tight">
+      <span class="text-sm font-semibold tracking-tight">TU/e Digital Exhibition</span>
+      <span class="text-xs text-mute">${pageName}</span>
+    </span>`;
+  bar.children[0].replaceWith(brand);
+
   // "/project/" or "/" is the index page.
   const current = location.pathname.split('/').pop() || 'index.html';
 
