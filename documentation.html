@@ -138,7 +138,7 @@ tailwind.config = {
     <div class="mb-6 mt-16">
       <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">Editors</p>
       <h2 id="deploy" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">3. Publishing changes — Deploy Frontend</h2>
-      <a href="https://staging.digitalexhibition.arch.tue.nl/wp-admin/options-general.php?page=cfdt-settings" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-block text-[13px] font-medium text-accentink hover:underline">Settings → Deploy Frontend</a>
+      <a href="https://digitalexhibition.arch.tue.nl/wp-admin/options-general.php?page=fdeploy-settings" target="_blank" rel="noopener noreferrer" class="mt-1.5 inline-block text-[13px] font-medium text-accentink hover:underline">Settings → Deploy Frontend</a>
     </div>
     <p class="max-w-2xl text-[15px] leading-7 text-neutral-600">
       This is the one genuinely new step. The public Digital Exhibition site is no longer WordPress rendering pages directly — it's a separate front-end that's <strong class="font-semibold text-ink">built once and then served statically</strong>. That means edits made in WordPress (a new project, a swapped PDF, a text fix) are <strong class="font-semibold text-ink">not live automatically</strong>.
@@ -155,7 +155,7 @@ tailwind.config = {
       <p class="mt-1.5 text-[14px] leading-6 text-neutral-600">Batch your edits, then deploy once — not once per field. Editing in WordPress is instant and safe to repeat; each deploy takes several minutes, so there's no need to click it after every single change.</p>
     </div>
     <ul class="mt-5 max-w-2xl list-disc space-y-1.5 pl-5 text-[14px] leading-6 text-neutral-600">
-      <li>The "Cloudflare deploy hook URL" field is pre-configured — you don't need to touch it, just press the button.</li>
+      <li>The settings on that page (the GitHub workflow address, token and the other addresses) are pre-configured — you don't need to touch them, just press the button.</li>
     </ul>
 
     <!-- Quick reference -->
@@ -184,7 +184,7 @@ tailwind.config = {
           </tr>
           <tr class="border-t border-line align-top">
             <td class="px-4 py-3 font-medium text-ink">Publish changes to the live site</td>
-            <td class="px-4 py-3 text-mute"><a href="https://staging.digitalexhibition.arch.tue.nl/wp-admin/options-general.php?page=cfdt-settings" target="_blank" rel="noopener noreferrer" class="text-accentink hover:underline">Settings → Deploy Frontend</a></td>
+            <td class="px-4 py-3 text-mute"><a href="https://digitalexhibition.arch.tue.nl/wp-admin/options-general.php?page=fdeploy-settings" target="_blank" rel="noopener noreferrer" class="text-accentink hover:underline">Settings → Deploy Frontend</a></td>
             <td class="px-4 py-3 text-neutral-600">Click "Deploy Frontend", wait ~5–10 minutes.</td>
           </tr>
         </tbody>

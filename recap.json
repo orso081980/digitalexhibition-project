@@ -4,14 +4,14 @@
     "subtitle": "Where the WordPress site and the new Nuxt application stand, what we are waiting for, and how the pieces fit together",
     "client": "TU/e — Built Environment, Digital Exhibition platform",
     "author": "marco@tech-paw.com",
-    "updated": "2026-11-01",
-    "scope": "Staging / local only for now — nothing described here has been pushed to the live server."
+    "updated": "2026-11-23",
+    "scope": "The app runs on the TU/e server (linux3) and reads the live WordPress. The two addresses have not been switched yet."
   },
   "tldr": [
-    "The live WordPress site is unchanged apart from a few plugins added or removed. All the new work sits on staging / localhost. The plan is that after 6 November the current staging files will be merged with live.",
-    "The new front-end is a Nuxt application on Cloudflare. It reads pages from the WordPress REST API and shows them in a new layout, so WordPress stays the place where editors work. We still need to decide where the web app (Nuxt) is going to live.",
-    "Images come from one shared bucket for live, staging and the app (16.5 GB), instead of three copies. The staging uploads folder was deleted, so staging now relies only on the R2 bucket. For now, live keeps a duplicate of the uploaded images.",
-    "Before we go live we need: a decision on hosting (Cloudflare or somewhere else), approval of the latest staging, an email service, and testing of desktop, mobile and forms (most of these parts have already been tested). SEO is not a priority, but we will check which analytics and tracking tools we have or need."
+    "The WordPress code of staging has been merged into live (staging's version won). Both sites now follow the same branch, and their databases stay separate. Staging keeps using the Cloudflare R2 bucket for images, for development only; live keeps all its images on its own server.",
+    "The new front-end is a Nuxt application. It no longer runs on Cloudflare: it runs on the TU/e server (linux3) at live.digitalexhibition.arch.tue.nl and reads the live WordPress. GitHub builds it and linux3 only downloads the finished files. The Cloudflare address stays as a preview.",
+    "The Deploy Frontend button in WordPress now does the whole job: it starts the build on GitHub, then asks linux3 to download the result. Nobody has to log in to the server to publish a change.",
+    "Still to do: switch the two addresses (the app takes digitalexhibition.arch.tue.nl, WordPress live moves to live.digitalexhibition.arch.tue.nl), run the search and replace in the database, and fix the email on WordPress and on the app. The email waits for TU/e to fix the Microsoft mail."
   ],
   "domains": [
     {
@@ -19,7 +19,7 @@
       "icon": "fa-globe",
       "label": "WordPress — live",
       "url": "https://digitalexhibition.arch.tue.nl/",
-      "role": "Current public website. Content unchanged apart from a few plugin changes.",
+      "role": "Current public website and the content source of the app. Its code is now the same as staging's; its images stay on its own server.",
       "badge": "Live",
       "tone": "emerald"
     },
@@ -28,18 +28,27 @@
       "icon": "fa-flask",
       "label": "WordPress — staging",
       "url": "https://staging.digitalexhibition.arch.tue.nl/",
-      "role": "Where the changes are tested. It carries every modification that will move to live.",
-      "badge": "Needs approval",
+      "role": "Where changes are tested. It uses the R2 bucket for its images (development only), and it is an emergency replica of live.",
+      "badge": "Development",
       "tone": "amber"
     },
     {
       "id": "app",
-      "icon": "fa-cloud",
-      "label": "Nuxt application — Cloudflare",
-      "url": "https://digitalexhibition.marco-977.workers.dev/",
-      "role": "The new front-end. Reads the WordPress REST API and shows the pages in a new layout.",
-      "badge": "Preview",
+      "icon": "fa-server",
+      "label": "Nuxt application — linux3",
+      "url": "https://live.digitalexhibition.arch.tue.nl/",
+      "role": "The new front-end, running on the TU/e server. Reads the live WordPress REST API and shows the pages in a new layout.",
+      "badge": "Running",
       "tone": "sky"
+    },
+    {
+      "id": "preview",
+      "icon": "fa-cloud",
+      "label": "Nuxt application — Cloudflare (preview)",
+      "url": "https://digitalexhibition.marco-977.workers.dev/",
+      "role": "The first version of the app, kept as a preview. The live app is the one on linux3.",
+      "badge": "Preview",
+      "tone": "neutral"
     },
     {
       "id": "gh-wp",
@@ -55,16 +64,16 @@
       "icon": "fa-brands fa-github",
       "label": "GitHub — Nuxt repository",
       "url": "https://github.com/orso081980/digitalexhibition",
-      "role": "Source of the new front-end application.",
+      "role": "Source of the application. Branch linux holds the code and the build pipeline, linux-deploy the finished build that linux3 downloads, main the Cloudflare version.",
       "badge": "Private",
       "tone": "neutral"
     },
     {
       "id": "r2",
       "icon": "fa-bucket",
-      "label": "Cloudflare R2 — media bucket",
+      "label": "Cloudflare R2 — media bucket (development)",
       "url": "https://pub-16f8e6dfcd9345b58d35a2cfaa84e205.r2.dev",
-      "role": "Holds every image and PDF (16.5 GB). The address is temporary and is meant to be replaced by a proper domain.",
+      "role": "Holds the images and PDFs of staging (16.5 GB), for development only. Live does not use it. The address is temporary and is meant to be replaced by a proper domain.",
       "badge": "Temporary URL (all the files are accessible, but the root is not for security reasons)",
       "tone": "amber",
       "linkable": false
@@ -73,13 +82,13 @@
   "targetDomains": [
     {
       "host": "digitalexhibition.arch.tue.nl",
-      "serves": "The Nuxt application — what visitors see",
+      "serves": "The Nuxt application on linux3 — what visitors will see",
       "icon": "fa-cloud",
       "tone": "sky"
     },
     {
       "host": "live.digitalexhibition.arch.tue.nl",
-      "serves": "WordPress live — editors work here and feed the app",
+      "serves": "WordPress live — editors work here and feed the app (it is at digitalexhibition.arch.tue.nl today)",
       "icon": "fa-globe",
       "tone": "emerald"
     },
@@ -95,55 +104,46 @@
       "id": "A1",
       "icon": "fa-envelope",
       "title": "Email system",
-      "detail": "Password reset and the contact form need a working mail service. Brevo is the proposed option (free plan: 300 emails per day) as an alternative to Microsoft Graph via Azure. WP Mail SMTP on WordPress and the contact endpoint in the app both connect to it.",
+      "status": "waiting",
+      "detail": "Password reset and the contact form need a working mail service. WordPress live has FluentSMTP installed, ready to connect to TU/e's Microsoft mail as soon as it works. The contact form of the app checks the message but sends nothing yet: its mail connection is not finished, so it needs the same sender. Brevo (free plan, 300 emails per day) is the alternative.",
       "waitingOn": "TU/e",
-      "ask": "Choose Brevo or Microsoft Graph, so the sender domain can be set up.",
-      "status": "waiting"
+      "ask": "Fix the Microsoft mail, so the sender can be set up in FluentSMTP and in the app."
     },
     {
       "id": "A2",
-      "icon": "fa-magnifying-glass-chart",
-      "title": "To investigate: analytics & tracking",
-      "detail": "SEO is not a priority. What we do want to know is which of these tools the site has today, or needs: Google Analytics, Google Search Console, Google Tag Manager and a cookie script.",
-      "waitingOn": "Marco, with TU/e",
-      "ask": "Find out which of these are in use today and which are wanted.",
-      "status": "investigate"
+      "icon": "fa-code-merge",
+      "title": "Switch the addresses and update the database",
+      "status": "todo",
+      "detail": "The app takes digitalexhibition.arch.tue.nl and WordPress live moves to live.digitalexhibition.arch.tue.nl. Every address stored in the WordPress database is replaced (search and replace, after a backup), the app is pointed at the new WordPress address.",
+      "waitingOn": "Marco",
+      "ask": "Planned after this update, at a quiet moment. Nothing is needed from TU/e for the content itself."
     },
     {
       "id": "A3",
-      "icon": "fa-flask",
-      "title": "Approve the latest staging website",
-      "detail": "Staging was updated after the last meeting (notes of 2026-10-29 and the back-end and front-end changes up to 1 November). It now has: the renamed theme, media served only from the R2 bucket, a site-settings endpoint the app reads for logos, menus and footer, a Deploy Frontend button that follows the build until it is live, and video support in the media library. The staging and production databases are not synchronised, but both are up to date.",
-      "waitingOn": "Deniz",
-      "ask": "Log in to the latest staging, review it and confirm, so the merge after 6 November can go ahead.",
-      "status": "review"
+      "icon": "fa-vial-circle-check",
+      "title": "Tests before going live",
+      "status": "todo",
+      "detail": "Most parts have already been tested. After the address switch the application gets a final check on desktop and mobile, including the forms. On WordPress, the new admin UX/UI gets manual and automated testing.",
+      "waitingOn": "Marco (app) · Deniz (WordPress)",
+      "ask": "Manual and automated testing of the new WordPress interface, after the switch."
     },
     {
       "id": "A4",
       "icon": "fa-server",
-      "title": "Decide the hosting",
-      "detail": "Where the web application (Nuxt on Cloudflare) and the bucket (R2?) will live. Jonathan suggests Bunny.net.",
-      "waitingOn": "Jonathan / TU/e",
-      "ask": "Decide the hosting for the app and the bucket.",
-      "status": "waiting"
+      "title": "Hosting decided: linux3",
+      "status": "done",
+      "detail": "The app runs on the TU/e server (linux3) instead of Cloudflare, so the question about Cloudflare or another host (such as Bunny.net) is closed. The Cloudflare address stays as a preview, and the R2 bucket is kept for staging only.",
+      "waitingOn": "—",
+      "ask": "Nothing: decided and in use."
     },
     {
       "id": "A5",
-      "icon": "fa-code-merge",
-      "title": "Merge staging and turn it into production",
-      "detail": "The live site has barely changed (a few plugins added or removed). The files and the database of staging will be merged into live, unless more content is added in the meantime.",
-      "waitingOn": "Marco",
-      "ask": "Planned after 6 November, once staging is approved (A3) and the hosting is decided (A4).",
-      "status": "todo"
-    },
-    {
-      "id": "A6",
-      "icon": "fa-vial-circle-check",
-      "title": "Tests before going live",
-      "detail": "Most parts have already been tested. Once the WordPress live site has been updated, the application gets a final check on desktop and mobile, including the forms. On WordPress, the new admin UX/UI gets manual and automated testing.",
-      "waitingOn": "Marco (app) · Deniz (WordPress)",
-      "ask": "Manual and automated testing of the new WordPress interface, after WordPress live is live.",
-      "status": "todo"
+      "icon": "fa-flask",
+      "title": "Staging merged into live",
+      "status": "done",
+      "detail": "The files of staging were merged into live (staging's version won). The databases were not merged: live's database is only changed by running prepared scripts. Host files and live-only plugins were left as they are.",
+      "waitingOn": "—",
+      "ask": "Nothing: done."
     }
   ],
   "plugins": [
@@ -162,8 +162,8 @@
     {
       "icon": "fa-cloud-arrow-up",
       "name": "Advanced Media Offloader",
-      "does": "Sends uploads to the Cloudflare R2 bucket so live, staging and the app share one copy of every image.",
-      "kind": "New"
+      "does": "Sends uploads to the Cloudflare R2 bucket. It is active on staging only, for development; live keeps its files local.",
+      "kind": "Staging only"
     },
     {
       "icon": "fa-clock-rotate-left",
@@ -172,16 +172,10 @@
       "kind": "New"
     },
     {
-      "icon": "fa-paper-plane",
-      "name": "WP Mail SMTP",
-      "does": "Will be connected to the email service, so password resets and form mails are delivered.",
-      "kind": "To connect"
-    },
-    {
       "icon": "fa-rocket",
-      "name": "Cloudflare Deploy Trigger",
-      "does": "A “Deploy Frontend” button. Editors write their pages, then press it once to publish them in the app. This saves API calls and avoids extra cost.",
-      "kind": "New"
+      "name": "Frontend Deploy",
+      "does": "The “Deploy Frontend” button. Editors write their pages, then press it once: it starts the build on GitHub and asks linux3 to download the result, so no one needs to touch the server. Renamed from Cloudflare Deploy Trigger; all Cloudflare code was removed.",
+      "kind": "Updated"
     }
   ],
   "environments": [
@@ -194,42 +188,41 @@
       "icon": "fa-life-ring",
       "title": "Emergency replica",
       "text": "If something goes wrong, staging can copy the live environment to reproduce and find errors."
+    },
+    {
+      "icon": "fa-cloud",
+      "title": "Cloudflare R2 for images",
+      "text": "Staging reads its images from the R2 bucket. This is for development only; live does not use it."
     }
   ],
   "email": {
-    "title": "Brevo as the email service",
-    "text": "Brevo is an alternative to Microsoft Graph via Azure. Its free plan allows 300 emails per day, which is enough for password resets and the contact form.",
+    "title": "Where the email stands",
+    "text": "WordPress live will send its mail through FluentSMTP, connected to TU/e's Microsoft mail once that is fixed. The app's contact form does not send mail yet: it is prepared for Brevo but the connection is not finished, so it needs a decision too. A single sender for both would be simplest. Brevo (300 emails per day on its free plan) is still the alternative.",
     "url": "https://www.brevo.com/pricing/see-all-features/",
     "urlLabel": "Brevo plans and membership"
   },
   "storage": {
     "before": [
       {
-        "label": "Flask server (TU/e) — live",
+        "label": "WordPress live — files on its own server",
         "size": "16.5 GB"
       },
       {
-        "label": "Flask server (TU/e) — staging copy",
-        "size": "16.5 GB"
-      },
-      {
-        "label": "Cloudflare R2",
-        "size": "16.5 GB"
+        "label": "Nuxt application — reads live's files, keeps no copy",
+        "size": "0 GB"
       }
     ],
     "after": {
-      "label": "One Cloudflare R2 bucket",
+      "label": "Cloudflare R2 bucket — development only",
       "size": "16.5 GB"
     },
     "users": [
-      "WordPress live",
-      "WordPress staging",
-      "Nuxt application"
+      "WordPress staging"
     ],
     "afterNotes": [
-      "For now, live keeps a duplicate of its uploaded images.",
+      "Live does not use R2: every image and PDF stays on its own server.",
       "The staging uploads folder was deleted, so staging reads only from the R2 bucket.",
-      "A backup of the media folder on the live website (uploads) is kept if needed."
+      "The R2 settings exist only in staging's configuration, so the code shared with live does nothing with R2 there."
     ]
   },
   "rest": {
@@ -393,13 +386,13 @@
     {
       "id": "offloader",
       "title": "Advanced Media Offloader",
-      "caption": "New uploads are sent to the shared Cloudflare R2 bucket. Local copies are removed once the cloud copy exists.",
+      "caption": "New uploads on staging are sent to the Cloudflare R2 bucket (development only). Local copies are removed once the cloud copy exists.",
       "src": "screenshots/recap/media-offloader.png"
     },
     {
       "id": "deploy",
       "title": "Deploy Frontend",
-      "caption": "The Deploy Frontend button in the top bar publishes new pages to the application. The hook URL and the optional Frontend URL are set once under Settings → Deploy Frontend. With the Frontend URL set, a progress notice follows the build until the new version is live.",
+      "caption": "The Deploy Frontend button in the top bar starts the build and the update of linux3. The GitHub workflow address and token, the app address and the Plesk address are set once under Settings → Deploy Frontend; a notice follows the build until the new version is live.",
       "src": "screenshots/recap/deploy-frontend.png?v=20261102"
     }
   ],
@@ -431,7 +424,7 @@
       }
     ]
   },
-  "changesIntro": "The live site still has its current content, with only a few plugins added or removed. Staging has had several changes. The files and the database of staging will be merged into the live website, unless more content is added in the meantime.",
+  "changesIntro": "The staging code was merged into live, so both WordPress sites now run the same code. They still differ in their environment: staging uses the Cloudflare R2 bucket for images, live keeps its images locally, and live has its own plugins (such as FluentSMTP). The databases are separate.",
   "discovery": {
     "summary": "Within the hosting platform (Flask) we found a web application firewall. Sometimes it made the deployment of the app hard, because it blocked requests that our development and deployment need.",
     "modes": [

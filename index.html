@@ -110,7 +110,7 @@ async function boot(){
 const SECTIONS = () => [
   ['summary','Summary'],
   ...DATA.workstreams.map(w => [w.id, `${w.code}. ${w.name}`]),
-  ['schedule','Seven-day plan'],
+  ['schedule','Nine-day plan'],
   ['plugins','Plugin audit'],
   ['architecture','Architecture'],
 ];
@@ -158,6 +158,7 @@ function render(){
     <div class="mt-8 flex flex-wrap gap-x-8 gap-y-2 border-y border-line py-4 text-[13px] text-mute">
       <span>Live · <a class="text-accentink hover:underline" href="${esc(d.meta.liveSite)}">${esc(d.meta.liveSite.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a></span>
       ${d.meta.stagingSite ? `<span>Staging · <a class="text-accentink hover:underline" href="${esc(d.meta.stagingSite)}">${esc(d.meta.stagingSite.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a></span>` : ''}
+      ${d.meta.appSite ? `<span>App on linux3 · <a class="text-accentink hover:underline" href="${esc(d.meta.appSite)}">${esc(d.meta.appSite.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a></span>` : ''}
       <span>Front-end · <code class="text-neutral-600">${esc(d.meta.repoFrontend)}</code>${d.meta.repoFrontendUrl ? ` · <a class="text-accentink hover:underline" href="${esc(d.meta.repoFrontendUrl)}">${esc(d.meta.repoFrontendUrl.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a>` : ''}</span>
       <span>Backend · <code class="text-neutral-600">${esc(d.meta.repoBackend)}</code>${d.meta.repoBackendUrl ? ` · <a class="text-accentink hover:underline" href="${esc(d.meta.repoBackendUrl)}">${esc(d.meta.repoBackendUrl.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a>` : ''}</span>
     </div>
@@ -186,7 +187,7 @@ function render(){
     </div>
     <div class="space-y-3">${d.workstreams.map(renderWorkstream).join('')}</div>
 
-    ${h('div','Seven-day plan')}
+    ${h('div','Nine-day plan')}
     <div id="schedule" class="overflow-hidden rounded-xl border border-line">
       ${d.schedule.days.map((day,i) => `
         <div class="flex flex-col gap-3 p-5 md:flex-row md:gap-8 ${i?'border-t border-line':''}">

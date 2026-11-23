@@ -114,13 +114,14 @@
           <a href="#tldr" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">TL;DR</a>
           <a href="#domains" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">Domains</a>
           <a href="#todo" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">What is still open</a>
-          <a href="#changes" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">What changed on
-            staging</a>
+          <a href="#changes" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">What changed in
+            WordPress</a>
           <a href="#app" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">How the app works</a>
           <a href="#rest" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">REST API &amp;
             Jamstack</a>
-          <a href="#media" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">Shared media
-            bucket</a>
+          <a href="#linux3" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">The app on linux3</a>
+          <a href="#media" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">Media: live and
+            staging</a>
           <a href="#postmortem" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">Post-mortem</a>
           <a href="#firewall" class="nav-lnk relative block py-1 text-mute transition hover:text-ink">Firewall</a>
         </nav>
@@ -153,8 +154,9 @@
       <div id="domain-grid" class="grid gap-3 sm:grid-cols-2"></div>
 
       <h3 class="mt-10 text-[15px] font-semibold">Planned layout after go-live</h3>
-      <p class="mt-1 max-w-2xl text-[14px] leading-6 text-neutral-600">The main domain will show the application. The
-        two WordPress environments move to their own addresses.</p>
+      <p class="mt-1 max-w-2xl text-[14px] leading-6 text-neutral-600">Today the app is at
+        live.digitalexhibition.arch.tue.nl and WordPress live is at digitalexhibition.arch.tue.nl. At go-live they swap:
+        the main domain will show the application and the two WordPress environments move to their own addresses.</p>
       <div id="target-grid" class="mt-4 grid gap-3 md:grid-cols-3"></div>
 
       <!-- What is still open -->
@@ -169,16 +171,16 @@
 
       <!-- What changed -->
       <div class="mb-6 mt-16">
-        <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">Staging / localhost</p>
-        <h2 id="changes" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">What changed on
-          staging</h2>
+        <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">WordPress</p>
+        <h2 id="changes" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">What changed in
+          WordPress</h2>
       </div>
       <p id="changes-intro" class="max-w-3xl text-[15px] leading-7 text-neutral-600"></p>
       <div id="plugin-grid" class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"></div>
 
       <div class="mt-8 grid gap-3 md:grid-cols-2">
         <div id="env-box" class="rounded-xl border border-line p-5">
-          <h3 class="text-[15px] font-semibold"><i class="fa-solid fa-flask mr-2 text-amber-600"></i>Two jobs for the
+          <h3 class="text-[15px] font-semibold"><i class="fa-solid fa-flask mr-2 text-amber-600"></i>Three jobs for the
             staging environment</h3>
           <ul id="env-list" class="mt-3 space-y-3"></ul>
         </div>
@@ -198,8 +200,9 @@
         </h2>
       </div>
       <p class="max-w-3xl text-[15px] leading-7 text-neutral-600">Editors keep working in WordPress. The Nuxt
-        application reads that content through the WordPress REST API and shows it in a different layout. Images are not
-        copied: all three sites use one shared bucket.</p>
+        application reads that content through the WordPress REST API and shows it in a different layout. The app keeps
+        no copy of the images: it reads them from the live WordPress. Pages are built ahead of time on GitHub and
+        served from the TU/e server (linux3).</p>
 
       <!-- Architecture diagram -->
       <figure class="avoid-break mt-8 rounded-xl border border-line bg-panel p-5 md:p-7"
@@ -240,9 +243,9 @@
 
           <div class="rounded-lg border border-sky-200 bg-white p-4">
             <div class="text-center">
-              <i class="fa-solid fa-cloud text-2xl text-sky-700"></i>
-              <p class="mt-2 text-[13px] font-semibold">Nuxt on Cloudflare</p>
-              <p class="mt-1 text-[12px] leading-5 text-mute">Builds every page once and serves it from the edge</p>
+              <i class="fa-solid fa-server text-2xl text-sky-700"></i>
+              <p class="mt-2 text-[13px] font-semibold">Nuxt on linux3</p>
+              <p class="mt-1 text-[12px] leading-5 text-mute">Pages are built once on GitHub and served by a small Node.js app on the TU/e server</p>
             </div>
           </div>
 
@@ -264,28 +267,29 @@
           <span
             class="inline-flex shrink-0 items-center gap-2 rounded-md bg-white px-2.5 py-1 text-[12px] font-semibold text-accentink ring-1 ring-inset ring-orange-200"><i
               class="fa-solid fa-rocket"></i>Deploy Frontend button</span>
-          <p class="text-[12.5px] leading-5 text-neutral-600">Pressed in WordPress, it tells Cloudflare to rebuild the
-            app. Nothing reaches visitors until someone presses it, so half-finished pages are never published.</p>
+          <p class="text-[12.5px] leading-5 text-neutral-600">Pressed in WordPress, it starts the build on GitHub and then
+            asks linux3 to download the result. Nothing reaches visitors until someone presses it, so half-finished pages
+            are never published.</p>
         </div>
 
         <!-- Shared bucket -->
         <div class="mt-4 rounded-lg border border-line bg-white p-4">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <span class="inline-flex items-center gap-2 text-[13px] font-semibold"><i
-                class="fa-solid fa-bucket text-orange-600"></i>One shared Cloudflare R2 bucket</span>
-            <span class="text-[12px] text-mute">all images and PDFs · 16.5 GB</span>
+                class="fa-solid fa-bucket text-orange-600"></i>Cloudflare R2 bucket — development only</span>
+            <span class="text-[12px] text-mute">staging images and PDFs · 16.5 GB</span>
           </div>
           <div class="mt-3 grid gap-2 sm:grid-cols-3">
             <div class="flex items-center gap-2 rounded-md bg-panel px-3 py-2 text-[12px] ring-1 ring-inset ring-line">
-              <i class="fa-solid fa-arrows-up-down text-emerald-700"></i>WordPress live</div>
-            <div class="flex items-center gap-2 rounded-md bg-panel px-3 py-2 text-[12px] ring-1 ring-inset ring-line">
               <i class="fa-solid fa-arrows-up-down text-amber-600"></i>WordPress staging</div>
             <div class="flex items-center gap-2 rounded-md bg-panel px-3 py-2 text-[12px] ring-1 ring-inset ring-line">
-              <i class="fa-solid fa-arrow-down text-sky-700"></i>Nuxt application</div>
+              <i class="fa-solid fa-ban text-neutral-400"></i>WordPress live — not used</div>
+            <div class="flex items-center gap-2 rounded-md bg-panel px-3 py-2 text-[12px] ring-1 ring-inset ring-line">
+              <i class="fa-solid fa-ban text-neutral-400"></i>Nuxt application — not used</div>
           </div>
         </div>
-        <figcaption class="mt-3 text-[12px] text-mute">Arrows show the direction data moves. WordPress uploads files to
-          the bucket; the application only reads from it.</figcaption>
+        <figcaption class="mt-3 text-[12px] text-mute">Only WordPress staging uploads to the bucket. Live and the
+          application use the files on the live WordPress server.</figcaption>
       </figure>
 
       <!-- Publish flow -->
@@ -293,7 +297,7 @@
       <ol id="flow" class="mt-4 grid gap-3 md:grid-cols-5"></ol>
       <p class="mt-3 max-w-3xl text-[12.5px] leading-5 text-mute"><i
           class="fa-solid fa-circle-info mr-1.5 text-neutral-400"></i>Why the manual “Press Deploy” step? It saves API
-        calls. On a server-side-rendered website every visit would call WordPress, and that can be costly. Here
+        calls and avoids rebuilding for every small edit. On a server-side-rendered website every visit would call WordPress, and that can be costly. Here
         WordPress is called once per deploy instead.</p>
 
       <!-- REST API & Jamstack -->
@@ -315,14 +319,14 @@
         <div class="rounded-xl border border-line p-5">
           <i class="fa-solid fa-plug text-xl text-sky-600"></i>
           <h3 class="mt-3 text-[14px] font-semibold"><span class="font-serif text-lg text-accentink">A</span>PIs</h3>
-          <p class="mt-1 text-[13px] leading-5 text-neutral-600">The WordPress REST API supplies the content. Brevo
-            handles the contact form mail.</p>
+          <p class="mt-1 text-[13px] leading-5 text-neutral-600">The WordPress REST API supplies the content. The contact
+            form's mail service is still to be connected.</p>
         </div>
         <div class="rounded-xl border border-line p-5">
           <i class="fa-brands fa-html5 text-xl text-orange-600"></i>
           <h3 class="mt-3 text-[14px] font-semibold"><span class="font-serif text-lg text-accentink">M</span>arkup</h3>
           <p class="mt-1 text-[13px] leading-5 text-neutral-600">Every page is turned into ready-made HTML at build time
-            and served from Cloudflare's edge.</p>
+            and served from the TU/e server (linux3).</p>
         </div>
       </div>
 
@@ -380,30 +384,77 @@
       </div>
 
       <!-- Media bucket -->
+            <!-- The app on linux3 -->
       <div class="mb-6 mt-16">
-        <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">Images and PDFs</p>
-        <h2 id="media" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">Shared media
-          bucket</h2>
+        <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">Hosting</p>
+        <h2 id="linux3" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">The app on linux3
+        </h2>
       </div>
-      <p class="max-w-3xl text-[15px] leading-7 text-neutral-600">Live, staging and the Nuxt application will all read
-        their images from the same bucket. This saves space, because we only keep one copy.</p>
+      <p class="max-w-3xl text-[15px] leading-7 text-neutral-600">The app moved from Cloudflare to the TU/e server
+        (linux3), where it runs at live.digitalexhibition.arch.tue.nl. The Cloudflare address stays as a preview. The
+        site is built on GitHub, so the server never builds anything: it only downloads the finished files and restarts
+        the app on them.</p>
+
+      <div class="mt-6 grid gap-3 md:grid-cols-3">
+        <div class="avoid-break rounded-xl border border-line p-5">
+          <i class="fa-solid fa-code-branch text-xl text-sky-600"></i>
+          <h3 class="mt-3 text-[14px] font-semibold">Branch “linux” — the source</h3>
+          <p class="mt-1 text-[13px] leading-5 text-neutral-600">The code of the app and the GitHub pipeline. Pushing
+            here, or pressing Deploy Frontend in WordPress, starts a build (5–10 minutes).</p>
+        </div>
+        <div class="avoid-break rounded-xl border border-line p-5">
+          <i class="fa-solid fa-box-open text-xl text-emerald-600"></i>
+          <h3 class="mt-3 text-[14px] font-semibold">Branch “linux-deploy” — the finished build</h3>
+          <p class="mt-1 text-[13px] leading-5 text-neutral-600">Only the ready-made files, one commit per build.
+            Plesk on linux3 follows this branch and deploys it automatically.</p>
+        </div>
+        <div class="avoid-break rounded-xl border border-line p-5">
+          <i class="fa-solid fa-cloud text-xl text-neutral-500"></i>
+          <h3 class="mt-3 text-[14px] font-semibold">Branch “main” — Cloudflare</h3>
+          <p class="mt-1 text-[13px] leading-5 text-neutral-600">The first version of the app, kept as a preview. It is
+            not the one that gets updated.</p>
+        </div>
+      </div>
+
+      <h3 class="mt-8 text-[15px] font-semibold">How the Deploy Frontend button reaches linux3</h3>
+      <ol class="mt-3 max-w-3xl space-y-2 text-[13.5px] leading-6 text-neutral-600">
+        <li class="flex gap-3"><span class="font-mono text-[12px] text-neutral-400">1</span><span>WordPress asks GitHub to
+            start the build, using a token limited to that one repository.</span></li>
+        <li class="flex gap-3"><span class="font-mono text-[12px] text-neutral-400">2</span><span>GitHub builds the site
+            and publishes it to linux-deploy.</span></li>
+        <li class="flex gap-3"><span class="font-mono text-[12px] text-neutral-400">3</span><span>GitHub cannot reach the
+            server's control panel from outside (its port is closed), so WordPress, which runs on the same server, asks
+            Plesk to download the new files: after about two minutes, then every 30 seconds until the new version is
+            live.</span></li>
+        <li class="flex gap-3"><span class="font-mono text-[12px] text-neutral-400">4</span><span>Plesk deploys the files
+            by itself and the app restarts on them. The WordPress settings page shows the result of the last
+            call.</span></li>
+      </ol>
+
+<div class="mb-6 mt-16">
+        <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-accentink">Images and PDFs</p>
+        <h2 id="media" class="scroll-mt-24 font-serif text-[26px] font-medium tracking-tight text-ink">Media: live and
+          staging</h2>
+      </div>
+      <p class="max-w-3xl text-[15px] leading-7 text-neutral-600">Live keeps every image and PDF on its own server, and
+        the Nuxt application reads them from there. Staging uses a Cloudflare R2 bucket instead, for development only.
+        The two never mix: nothing from the bucket is copied to live.</p>
 
       <div class="avoid-break mt-6 grid items-stretch gap-3 md:grid-cols-[1fr_auto_1fr]">
         <div class="rounded-xl border border-line p-5">
-          <p class="text-[11px] font-semibold uppercase tracking-wide text-mute">Today</p>
+          <p class="text-[11px] font-semibold uppercase tracking-wide text-mute">Live and the app</p>
           <ul id="storage-before" class="mt-3 space-y-2"></ul>
           <p class="mt-4 border-t border-line pt-3 text-[13px] text-neutral-600"><span
-              class="font-semibold text-ink">49.5 GB</span> in three places</p>
+              class="font-semibold text-ink">16.5 GB</span> on the live server, no bucket</p>
         </div>
-        <div class="flex items-center justify-center text-accentink"><i class="fa-solid fa-arrow-down md:hidden"></i><i
-            class="fa-solid fa-arrow-right hidden text-lg md:block"></i></div>
+        <div class="flex items-center justify-center text-[11px] font-semibold uppercase tracking-wide text-mute">not shared</div>
         <div class="rounded-xl border border-orange-200 bg-orange-50/50 p-5">
-          <p class="text-[11px] font-semibold uppercase tracking-wide text-accentink">After</p>
+          <p class="text-[11px] font-semibold uppercase tracking-wide text-accentink">Staging (development)</p>
           <div id="storage-after" class="mt-3"></div>
           <ul id="storage-users" class="mt-3 flex flex-wrap gap-1.5"></ul>
           <p class="mt-4 border-t border-orange-200 pt-3 text-[13px] text-neutral-600"><span
-              class="font-semibold text-ink">16.5 GB</span> in one place</p>
-          <p class="mt-3 text-[11px] font-semibold uppercase tracking-wide text-accentink">For now</p>
+              class="font-semibold text-ink">16.5 GB</span> in the bucket</p>
+          <p class="mt-3 text-[11px] font-semibold uppercase tracking-wide text-accentink">Good to know</p>
           <ul id="storage-notes" class="mt-1.5 space-y-1.5"></ul>
         </div>
       </div>
@@ -463,13 +514,14 @@
       investigate: ['To investigate', 'bg-violet-50 text-violet-700 ring-violet-600/20'],
       todo: ['To do', 'bg-neutral-100 text-neutral-600 ring-neutral-500/20'],
       ours: ['Our task', 'bg-sky-50 text-sky-700 ring-sky-600/20'],
+      done: ['Done', 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'],
     };
     const FLOW = [
       ['fa-pen-to-square', 'Edit', 'An editor writes or updates a page in WordPress.'],
       ['fa-rocket', 'Press Deploy', 'One click on “Deploy Frontend”. A 60-second cooldown stops repeated clicks.'],
-      ['fa-hammer', 'Cloudflare builds', 'Cloudflare runs the Nuxt build for the application.'],
-      ['fa-download', 'Read the API', 'The build calls the REST API once and creates a ready-made page for every route.'],
-      ['fa-bolt', 'Visitors', 'Pages are served from Cloudflare’s edge, with no WordPress call per visit.'],
+      ['fa-hammer', 'GitHub builds', 'GitHub reads the whole site from the REST API once, builds every page and publishes the files to linux-deploy.'],
+      ['fa-download', 'linux3 downloads', 'WordPress asks Plesk on the same server to pull the new files; the app restarts on them by itself.'],
+      ['fa-bolt', 'Visitors', 'Pages are served from linux3, with no WordPress call per visit.'],
     ];
 
     async function boot() {

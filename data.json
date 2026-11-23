@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Digital Exhibition — Headless Migration",
-    "subtitle": "Cloudflare front-end + slimmed WordPress backend",
+    "subtitle": "Nuxt front-end on linux3 + slimmed WordPress backend",
     "client": "TU/e — Built Environment, Digital Exhibition platform",
     "liveSite": "http://digitalexhibition.arch.tue.nl/",
     "stagingSite": "https://staging.digitalexhibition.arch.tue.nl/",
@@ -10,9 +10,10 @@
     "repoBackend": "backend (WordPress, wp-content under Git)",
     "repoBackendUrl": "https://github.com/orso081980/digitalexhibition-backend",
     "author": "marco@tech-paw.com",
-    "updated": "2026-11-01",
-    "timeboxDays": 7,
-    "summary": "Move Digital Exhibition to a headless architecture: a Nuxt 3 / Vue / Tailwind front-end, built as a fully static site on Cloudflare, that reads the existing WordPress REST API, while the WordPress install on the TU/e server is stripped back to a lean content API. Media moves to one Cloudflare R2 bucket shared by live, staging and the app, and transactional mail moves to Microsoft Graph via Azure or to Brevo (to be decided). Both the WordPress backend (wp-content) and the front-end are under Git version control. There is no automated pipeline: Git is connected to the server's control panel, so files are changed, checked on staging, and then merged into production by hand. The merge of staging into live is planned after 6 November."
+    "updated": "2026-11-23",
+    "timeboxDays": 9,
+    "summary": "Move Digital Exhibition to a headless architecture: a Nuxt 3 / Vue / Tailwind front-end that reads the existing WordPress REST API, while the WordPress install on the TU/e server is stripped back to a lean content API. The app was first built and previewed on Cloudflare; that address stays as a preview. It now runs on the TU/e server (linux3, Plesk) at live.digitalexhibition.arch.tue.nl: GitHub builds it and the server only downloads the finished files. Pressing Deploy Frontend in WordPress starts the build and linux3 updates by itself. The Cloudflare R2 bucket is used for development only (staging); live keeps its images on its own server. Both the WordPress backend (wp-content) and the front-end are under Git. Still to do: switch the two addresses, the search and replace in the database, and the email.",
+    "appSite": "https://live.digitalexhibition.arch.tue.nl/"
   },
   "legend": {
     "status": {
@@ -51,10 +52,10 @@
     {
       "id": "ws1",
       "code": "1",
-      "name": "Cloudflare front-end (Nuxt)",
+      "name": "Nuxt front-end",
       "color": "sky",
-      "goal": "A production Nuxt 3 front-end, served as a fully static site on Cloudflare, that renders the whole Digital Exhibition from the WordPress REST API, with no upstream host or CORS exposed to the browser.",
-      "context": "Lives in frontend/digital-exhibition, in its own Git repository. Every route — pages, archives, every entry and the home page — is pre-rendered at build time; the home hero is picked in the browser on each visit. Site identity, menus and archive layout are read from WordPress (GET /wp-json/cd/v1/site). A build fails if WordPress can't answer, so Cloudflare keeps the previous complete deployment live. Only a few endpoints run at request time: the PDF proxy, the contact form, search and the site settings.",
+      "goal": "A production Nuxt 3 front-end that renders the whole Digital Exhibition from the WordPress REST API, with no upstream host or CORS exposed to the browser. It was previewed on Cloudflare and is served from linux3 (see workstream 7).",
+      "context": "Lives in frontend/digital-exhibition, in its own Git repository. Every route — pages, archives, every entry and the home page — is pre-rendered at build time; the home hero is picked in the browser on each visit. Site identity, menus and archive layout are read from WordPress (GET /wp-json/cd/v1/site). A build fails if WordPress can't answer, so the previous complete deployment stays live. Only a few endpoints run at request time: the PDF proxy, the contact form, search and the site settings.",
       "tasks": [
         {
           "id": "1.1",
@@ -134,7 +135,7 @@
           "status": "done",
           "priority": "P0",
           "day": 5,
-          "notes": "Pre-rendered pages are served as static assets (wrangler.jsonc); the Worker only runs for /api/*. Rebuilds start from WordPress with the Deploy Frontend button (Cloudflare deploy hook). Prerender concurrency is 1, with retries and a warm-up request, because the upstream host drops HTTP/2 streams under parallel load."
+          "notes": "Pre-rendered pages are served as static assets (wrangler.jsonc); the Worker only runs for /api/*. Rebuilds start from WordPress with the Deploy Frontend button (Cloudflare deploy hook). Prerender concurrency is 1, with retries and a warm-up request, because the upstream host drops HTTP/2 streams under parallel load. Cloudflare is now only a preview of the app: the live app runs on linux3 (see 7.1–7.5)."
         },
         {
           "id": "1.11",
@@ -142,7 +143,7 @@
           "status": "done",
           "priority": "P0",
           "day": 2,
-          "notes": "WP_API_BASE, WP_SITE_URL and the NUXT_PUBLIC_* values are environment variables; no domain is hardcoded. Point them at staging until the merge, then at live."
+          "notes": "WP_API_BASE, WP_SITE_URL and the NUXT_PUBLIC_* values are environment variables; no domain is hardcoded. Point them at staging until the merge, then at live. The build now reads the live WordPress (see 7.6)."
         },
         {
           "id": "1.12",
@@ -224,7 +225,7 @@
           "status": "done",
           "priority": "P1",
           "day": 7,
-          "notes": "Done — backend/README explains what Git tracks and what it doesn't, and how to reinstall the third-party plugins (bin/install-plugins.sh). It holds no secrets: credentials live only in wp-config.php, which is not tracked; the repository carries a placeholder (wp-config.reference.php)."
+          "notes": "Done — backend/README explains what Git tracks and what it doesn't, and that third-party plugins are not tracked (each server keeps its own). It holds no secrets: credentials live only in wp-config.php, which is not tracked; the repository carries a placeholder (wp-config.reference.php)."
         },
         {
           "id": "2.8",
@@ -232,7 +233,7 @@
           "status": "done",
           "priority": "P1",
           "day": 7,
-          "notes": "The admin-bar button asks for confirmation, then follows the Cloudflare build until it is live. The sticky Preview Changes button was removed and the admin sidebar now lists the day-to-day items first."
+          "notes": "The admin-bar button asks for confirmation, then follows the build (GitHub, then linux3) until the new version is live. The sticky Preview Changes button was removed and the admin sidebar now lists the day-to-day items first."
         },
         {
           "id": "2.9",
@@ -318,11 +319,11 @@
         },
         {
           "id": "3.8",
-          "title": "Decide — WP Mail SMTP → Brevo or Microsoft Graph",
+          "title": "Decide — WordPress mail: FluentSMTP on live, via TU/e's Microsoft mail",
           "status": "blocked",
           "priority": "P1",
           "day": 5,
-          "notes": "Waiting for TU/e to choose: Brevo (free plan, 300 emails a day) or Microsoft Graph via Azure. WP Mail SMTP then connects WordPress mail (password reset) to that service; the front-end contact form calls it directly (see 4.4)."
+          "notes": "Waiting for TU/e to fix the Microsoft mail. Live will then use FluentSMTP (already installed on live) to send WordPress mail such as password resets; Brevo (free plan, 300 emails a day) remains the alternative. The front-end contact form needs the same decision (see 4.4)."
         },
         {
           "id": "3.9",
@@ -358,20 +359,20 @@
         },
         {
           "id": "3.13",
-          "title": "WP Umbrella — waiting",
-          "status": "blocked",
+          "title": "WP Umbrella — kept as it is",
+          "status": "done",
           "priority": "P2",
           "day": 3,
-          "notes": "Waiting for TU/e: we don't know whether it is used by their theme, so it stays until they confirm. It also loads a must-use file (InitUmbrella.php)."
+          "notes": "Kept as it is on live, together with the must-use file it loads (InitUmbrella.php). Nothing to change."
         }
       ]
     },
     {
       "id": "ws4",
       "code": "4",
-      "name": "Assets, domain, staging & mail on Cloudflare",
+      "name": "Assets, domain, staging & mail",
       "color": "emerald",
-      "goal": "Media served from one shared Cloudflare R2 bucket, the domain set up for the app, a safe staging copy of the WordPress site, and transactional mail through Brevo or Microsoft Graph.",
+      "goal": "Media on an R2 bucket for development (staging) while live keeps its files local, the domain for the app, a safe staging copy of the WordPress site, and transactional mail.",
       "tasks": [
         {
           "id": "4.1",
@@ -379,15 +380,15 @@
           "status": "done",
           "priority": "P0",
           "day": 4,
-          "notes": "Advanced Media Offloader sends uploads to one shared R2 bucket, used by live, staging and the app. The staging uploads folder was deleted, so staging reads only from R2. For now live keeps a duplicate of its uploaded images, and a backup of the live uploads folder is kept if needed."
+          "notes": "Advanced Media Offloader sends uploads to a Cloudflare R2 bucket. It is used on staging only, for development: live keeps every image and PDF on its own server, and the app reads media from the live WordPress. The staging uploads folder was deleted, so staging reads only from R2."
         },
         {
           "id": "4.2",
-          "title": "Add the domain to Cloudflare — depends on the hosting decision",
-          "status": "blocked",
+          "title": "Hosting and domain for the app → linux3",
+          "status": "done",
           "priority": "P0",
           "day": 4,
-          "notes": "Waiting on the hosting decision (Cloudflare or somewhere else; Jonathan suggests Bunny.net). Planned layout: digitalexhibition.arch.tue.nl shows the app; live. and staging. subdomains hold the two WordPress sites. Needs TU/e DNS."
+          "notes": "Decision made: the app is hosted on linux3 (the TU/e server), not on Cloudflare. It already runs at live.digitalexhibition.arch.tue.nl. Final layout: digitalexhibition.arch.tue.nl shows the app; live. and staging. hold the two WordPress sites. The switch itself is task 7.11."
         },
         {
           "id": "4.3",
@@ -399,11 +400,11 @@
         },
         {
           "id": "4.4",
-          "title": "Transactional mail from the front-end (Brevo or Microsoft Graph)",
+          "title": "Transactional mail from the front-end (contact form)",
           "status": "blocked",
           "priority": "P1",
           "day": 5,
-          "notes": "The contact form is built (components/ContactForm.vue + server/api/contact.post.ts, with validation and honeypot). The handler only logs for now; the mail call is a marked TODO until TU/e chooses Brevo or Microsoft Graph via Azure."
+          "notes": "The contact form is built (components/ContactForm.vue + server/api/contact.post.ts, with validation and honeypot). The handler only logs: no mail is sent, because the Brevo call is still a marked TODO in the code, even if a key is set. Open: which account sends it (the same Microsoft mail as WordPress, or Brevo). Waiting on TU/e."
         },
         {
           "id": "4.5",
@@ -411,7 +412,7 @@
           "status": "done",
           "priority": "P2",
           "day": 7,
-          "notes": "Cache-Control on R2 objects, Cloudflare cache rules, confirm the use can stays in free tier, document the re-sync procedure for new uploads."
+          "notes": "Cache-Control on R2 objects, Cloudflare cache rules, confirm the use can stays in free tier, document the re-sync procedure for new uploads. R2 is now used by staging only."
         }
       ]
     },
@@ -421,7 +422,7 @@
       "name": "SEO on the front-end",
       "color": "rose",
       "goal": "The Nuxt front-end owns all discoverability: per-page meta, Open Graph, structured data, sitemap, robots — sourced from Yoast fields via REST.",
-      "context": "The front-end is currently noindex everywhere (robots.txt Disallow: /, meta robots, X-Robots-Tag via public/_headers). That must be lifted deliberately at cutover.",
+      "context": "Indexing is on: the front-end is indexable (robots.txt, meta robots and the sitemap are open). Canonical addresses follow NUXT_PUBLIC_SITE_URL, which changes at the address switch.",
       "tasks": [
         {
           "id": "5.1",
@@ -453,15 +454,15 @@
           "status": "todo",
           "priority": "P0",
           "day": 6,
-          "notes": "utils/seo.rewriteOrigin() already rewrites every WordPress URL (canonical, og:url, schema) to NUXT_PUBLIC_SITE_URL. At go-live set that to digitalexhibition.arch.tue.nl."
+          "notes": "utils/seo.rewriteOrigin() already rewrites every WordPress URL (canonical, og:url, schema) to NUXT_PUBLIC_SITE_URL. At go-live set that to digitalexhibition.arch.tue.nl, in the build workflow (it is live.digitalexhibition.arch.tue.nl for now)."
         },
         {
           "id": "5.5",
-          "title": "Lift noindex at cutover",
-          "status": "todo",
+          "title": "Lift noindex",
+          "status": "done",
           "priority": "P0",
           "day": 7,
-          "notes": "Gated behind NUXT_PUBLIC_INDEXABLE (default false): while false every route emits noindex + no JSON-LD + sitemap 404. Flip together with public/robots.txt and public/_headers (checklist added to both files)."
+          "notes": "Done: the app is indexable. NUXT_PUBLIC_INDEXABLE is true in the build workflow, so every route is indexable, the structured data is emitted and the sitemap is served."
         },
         {
           "id": "5.8",
@@ -469,15 +470,7 @@
           "status": "done",
           "priority": "P1",
           "day": 6,
-          "notes": "buildSeoHead now sends page URLs (canonical/og:url/JSON-LD) to the front-end host but keeps /wp-content media URLs on public.mediaUrl (the WP box now, R2 later) so og:image never 404s. og:image:secure_url/type/alt + twitter:image:alt added. public/robots.txt allow-lists facebookexternalhit / Twitterbot / LinkedInBot / Slackbot / WhatsApp / etc. so shared links render a card while search stays blocked by the noindex meta. Note: _headers is Pages-only — no effect on a *.workers.dev deploy."
-        },
-        {
-          "id": "5.9",
-          "title": "Investigate analytics & tracking",
-          "status": "todo",
-          "priority": "P2",
-          "day": 7,
-          "notes": "Check whether we have or need Google Analytics, Google Search Console, Google Tag Manager and a cookie script."
+          "notes": "buildSeoHead now sends page URLs (canonical/og:url/JSON-LD) to the front-end host but keeps /wp-content media URLs on public.mediaUrl (the live WordPress server) so og:image never 404s. og:image:secure_url/type/alt + twitter:image:alt added. public/robots.txt allow-lists facebookexternalhit / Twitterbot / LinkedInBot / Slackbot / WhatsApp / etc. so shared links render a card. Note: _headers is a Cloudflare Pages file — no effect on linux3."
         }
       ]
     },
@@ -486,8 +479,8 @@
       "code": "6",
       "name": "Version control (backend + front-end)",
       "color": "orange",
-      "goal": "Put the WordPress backend (wp-content) and the front-end under Git, and ship changes by checking them on staging and merging them into production by hand — there is no automated pipeline.",
-      "context": "Git is connected to the server's control panel, so files are merged manually; Git is the version history and the backup. The front-end has its own repository, and Cloudflare builds the app from it.",
+      "goal": "Put the WordPress backend (wp-content) and the front-end under Git. The backend is merged into live by hand after a check on staging; the front-end is built and published by a GitHub pipeline.",
+      "context": "Git is connected to the server's control panel, so files are merged manually; Git is the version history and the backup. The front-end has its own repository, built by GitHub Actions and deployed to linux3 (see workstream 7).",
       "tasks": [
         {
           "id": "6.1",
@@ -503,7 +496,7 @@
           "status": "done",
           "priority": "P1",
           "day": 2,
-          "notes": "Tracked: our own code only — the figuro-folder, custom_dashboard and cloudflare-deploy-trigger plugins, the active theme, mu-plugins and maintenance files. Third-party plugins are git-ignored and reinstalled with bin/install-plugins.sh. WordPress core, wp-config.php, logs and uploads (→ R2) are not tracked."
+          "notes": "Tracked: our own code only — the figuro-folder, custom_dashboard and frontend-deploy plugins, the active theme, mu-plugins and maintenance files. Third-party plugins are git-ignored: each server keeps its own. WordPress core, wp-config.php, logs and uploads are not tracked."
         },
         {
           "id": "6.3",
@@ -515,11 +508,11 @@
         },
         {
           "id": "6.4",
-          "title": "Staging → production by manual merge (no pipeline)",
-          "status": "todo",
+          "title": "Staging → production by manual merge (backend)",
+          "status": "done",
           "priority": "P0",
-          "day": 7,
-          "notes": "No GitHub Actions: Git is connected to the server's control panel, so files are merged by hand, after they have been checked on staging. Planned after 6 November: the staging files and database are merged into live, unless more content is added in the meantime."
+          "day": 9,
+          "notes": "Done for the code: the staging line (main) was merged into live, main wins, and the old live state is kept under a Git tag. Both sites now follow the same branch. The databases were not merged: live's database is changed only by running the migration scripts in bin/, by hand. The remaining step is the address switch (7.11 and 7.12)."
         },
         {
           "id": "6.5",
@@ -527,7 +520,113 @@
           "status": "done",
           "priority": "P1",
           "day": 2,
-          "notes": "The Nuxt app has its own Git repository (private on GitHub). Cloudflare builds the app from it, and the Deploy Frontend button in WordPress starts a new build."
+          "notes": "The Nuxt app has its own Git repository (private on GitHub). GitHub Actions builds the app from it, and the Deploy Frontend button in WordPress starts a new build."
+        }
+      ]
+    },
+    {
+      "id": "ws7",
+      "code": "7",
+      "name": "The app on linux3 + automatic deploy",
+      "color": "teal",
+      "goal": "Move the app from Cloudflare to linux3 (the TU/e server), build it on GitHub, and make the Deploy Frontend button update the site by itself.",
+      "context": "Added in two extra days (8 and 9), done over the weekend of 21–22 November so that visitors were not affected. The app repository now has three branches: main (the Cloudflare version, kept as a preview), linux (the source code and the GitHub pipeline) and linux-deploy (only the finished build, which linux3 downloads).",
+      "tasks": [
+        {
+          "id": "7.1",
+          "title": "Hosting decision: the app runs on linux3, not Cloudflare",
+          "status": "done",
+          "priority": "P0",
+          "day": 8,
+          "notes": "The app is hosted on the TU/e server (linux3, Plesk). The Cloudflare address stays as a preview of the app, and the R2 bucket is kept for staging (development) only. Live keeps its images on its own server."
+        },
+        {
+          "id": "7.2",
+          "title": "Node.js application in Plesk at live.digitalexhibition.arch.tue.nl",
+          "status": "done",
+          "priority": "P0",
+          "day": 8,
+          "notes": "A Plesk Node.js app in production mode, with the domain's folder as application root and an empty document root (public), so every request goes through the app. The startup file is app.cjs. The app restarts when tmp/restart.txt changes."
+        },
+        {
+          "id": "7.3",
+          "title": "Two new branches in the app repository: linux and linux-deploy",
+          "status": "done",
+          "priority": "P0",
+          "day": 8,
+          "notes": "linux holds the source code and the GitHub workflow; linux-deploy holds only the finished build, one commit per build. There are two because the building happens on GitHub: linux3 only needs the result, so nothing is built (or can break) on the server."
+        },
+        {
+          "id": "7.4",
+          "title": "GitHub Actions pipeline: build and publish",
+          "status": "done",
+          "priority": "P0",
+          "day": 8,
+          "notes": "On every push to linux, or on request, GitHub builds the site (5–10 minutes: it reads every page from WordPress) and publishes the files to linux-deploy. If WordPress can't be read the build fails and nothing is published, so a broken build never replaces the running site. The addresses are set in the workflow file; the mail secrets are not stored in Git but in Plesk."
+        },
+        {
+          "id": "7.5",
+          "title": "Plesk pulls linux-deploy automatically",
+          "status": "done",
+          "priority": "P0",
+          "day": 8,
+          "notes": "Plesk Git follows linux-deploy with deployment mode Automatic, into the app's folder. Every build carries a fresh tmp/restart.txt, so the app restarts on the new files by itself."
+        },
+        {
+          "id": "7.6",
+          "title": "The build reads the live WordPress",
+          "status": "done",
+          "priority": "P0",
+          "day": 9,
+          "notes": "Content now comes from the live WordPress (digitalexhibition.arch.tue.nl) instead of staging, and media is served from the same host, with no R2. Indexing for search engines is already on."
+        },
+        {
+          "id": "7.7",
+          "title": "Merge the staging code into live (main → live)",
+          "status": "done",
+          "priority": "P0",
+          "day": 9,
+          "notes": "The WordPress code of staging became the live branch. Files managed by the host (WP Toolkit, WP Health, the maintenance page) were left as on live, and so were the live-only plugins. The R2 pieces stay inactive on live: they only switch on when an R2 setting exists in wp-config, which live does not have."
+        },
+        {
+          "id": "7.8",
+          "title": "Deploy Frontend plugin starts the GitHub build",
+          "status": "done",
+          "priority": "P0",
+          "day": 9,
+          "notes": "The plugin that was called Cloudflare Deploy Trigger is now Frontend Deploy, with all the Cloudflare code removed. The button starts the GitHub workflow through GitHub's API, with a token limited to that one repository. Settings → Deploy Frontend holds the workflow address, the token, the branch, the app address and the Plesk address."
+        },
+        {
+          "id": "7.9",
+          "title": "Automatic pull on linux3: WordPress calls Plesk",
+          "status": "done",
+          "priority": "P0",
+          "day": 9,
+          "notes": "GitHub cannot reach Plesk's webhook from outside (the panel's port is closed to the internet), and SSH was not wanted. WordPress runs on the same server, so after the button is pressed it calls Plesk's webhook locally: first after about two minutes, then every 30 seconds until the new build is live. The settings page shows the result of the last call. No manual 'Pull' in Plesk anymore."
+        },
+        {
+          "id": "7.10",
+          "title": "End-to-end test: button → GitHub → linux3",
+          "status": "done",
+          "priority": "P0",
+          "day": 9,
+          "notes": "Pressing Deploy Frontend started the GitHub build; the result was published to linux-deploy and deployed by Plesk without any manual step. The app's build number changed and a course created minutes before pressing the button was on the new site."
+        },
+        {
+          "id": "7.11",
+          "title": "Switch the addresses",
+          "status": "todo",
+          "priority": "P0",
+          "day": 9,
+          "notes": "The app takes digitalexhibition.arch.tue.nl and WordPress live moves to live.digitalexhibition.arch.tue.nl. Then the build reads WordPress at its new address, and NUXT_PUBLIC_SITE_URL becomes the final address (task 5.4)."
+        },
+        {
+          "id": "7.12",
+          "title": "Search and replace in the database for the new WordPress address",
+          "status": "todo",
+          "priority": "P0",
+          "day": 9,
+          "notes": "Every stored address in the WordPress database changes from digitalexhibition.arch.tue.nl to live.digitalexhibition.arch.tue.nl, after a database backup and a dry run (Better Search Replace is installed for this)."
         }
       ]
     }
@@ -608,8 +707,8 @@
         "plugin": "advanced-media-offloader",
         "purpose": "Sends uploads to the Cloudflare R2 bucket",
         "decision": "KEEP",
-        "action": "Active on staging; to be set up on live",
-        "note": "One bucket for live, staging and the app."
+        "action": "Keep — used on staging only",
+        "note": "R2 is for development. Live keeps its images on its own server; the plugin is not installed there."
       },
       {
         "plugin": "aryo-activity-log",
@@ -626,11 +725,11 @@
         "note": "Ability of adding svg images"
       },
       {
-        "plugin": "cloudflare-deploy-trigger",
+        "plugin": "frontend-deploy",
         "purpose": "Deploy Frontend button + build progress",
         "decision": "KEEP",
-        "action": "Our own plugin; added to live with the merge",
-        "note": "Starts the Cloudflare build."
+        "action": "Our own plugin; added to live with the merge (renamed from Cloudflare Deploy Trigger)",
+        "note": "Starts the GitHub build and asks Plesk on linux3 to pull the result."
       },
       {
         "plugin": "custom_dashboard",
@@ -640,24 +739,17 @@
         "note": "Serves cd/v1/site to the front-end and customize the admin dashboard and the theme."
       },
       {
-        "plugin": "wp-mail-smtp",
+        "plugin": "fluent-smtp",
         "purpose": "Route WordPress mail through SMTP",
         "decision": "REVIEW",
-        "action": "Connect to Brevo or Microsoft Graph",
-        "note": "Waiting for TU/e to choose the service."
-      },
-      {
-        "plugin": "mailin",
-        "purpose": "Brevo plugin",
-        "decision": "REVIEW",
-        "action": "Installed locally/staging",
-        "note": "Depends on the email decision. Only needed if Brevo is chosen (alternative to wp-mail-smtp)"
+        "action": "Installed on live; connect it to TU/e's Microsoft mail once it is fixed",
+        "note": "Live only. The merge leaves it as it is."
       },
       {
         "plugin": "wp-health + InitUmbrella.php",
         "purpose": "WP Umbrella — site monitoring",
-        "decision": "WAITING",
-        "action": "Keep until TU/e confirms, if they use it.",
+        "decision": "KEEP",
+        "action": "Keep as it is",
         "note": "Confidently manage, monitor, secure, and report on all your WordPress sites, from one reliable dashboard built for agencies that grow."
       },
       {
@@ -770,7 +862,7 @@
       {
         "day": 6,
         "label": "Day 6 — SEO on the front-end",
-        "focus": "Give the front-end full discoverability, still behind noindex.",
+        "focus": "Give the front-end full discoverability.",
         "items": [
           "5.1 Per-route meta from yoast_head_json",
           "5.2 JSON-LD structured data",
@@ -785,16 +877,40 @@
         "items": [
           "1.13 Cross-browser + mobile QA side-by-side with the live site",
           "5.5 Lift noindex (robots.txt, meta, X-Robots-Tag)",
-          "5.9 Investigate analytics & tracking tools",
           "4.5 R2 cost check",
           "2.7 Document the final server layout"
+        ]
+      },
+      {
+        "day": 8,
+        "label": "Day 8 — The app moves to linux3",
+        "focus": "Run the app on the TU/e server instead of Cloudflare. Done over the weekend, to avoid disturbing visitors.",
+        "items": [
+          "7.1 Hosting decision: linux3",
+          "7.2 Node.js application in Plesk",
+          "7.3 Branches linux (source + pipeline) and linux-deploy (finished build)",
+          "7.4 GitHub Actions: build and publish",
+          "7.5 Plesk pulls linux-deploy automatically"
+        ]
+      },
+      {
+        "day": 9,
+        "label": "Day 9 — Merge, connect WordPress, test",
+        "focus": "Point the app at the live WordPress and make the Deploy Frontend button do everything. Done over the weekend.",
+        "items": [
+          "7.6 The build reads the live WordPress",
+          "7.7 / 6.4 Merge the staging code into live (main → live)",
+          "7.8 Frontend Deploy plugin starts the GitHub build",
+          "7.9 WordPress calls Plesk, so linux3 updates by itself",
+          "7.10 End-to-end test of the button",
+          "Still to do: 7.11 switch the addresses · 7.12 database search and replace · 3.8 / 4.4 email on WordPress and the app"
         ]
       }
     ]
   },
   "architecture": {
     "before": "Browser → WordPress (Elementor theme renders HTML) on TU/e LAMP box. Media, mail, SEO all inside WP.",
-    "after": "Browser → Cloudflare (Nuxt, pre-rendered static pages served as files; only /api/* runs as a Worker) → /api/wp proxy → WordPress REST API (content source only). Media → one shared Cloudflare R2 bucket. Mail → Brevo or Microsoft Graph via Azure, to be decided. SEO and layout owned by Nuxt. Backend and front-end are under Git; backend file changes are checked on staging and merged into production by hand.",
+    "after": "Browser → linux3 (Plesk: the Nuxt app, pre-rendered pages served by a small Node.js app; only /api/* runs per request) → /api/wp proxy → WordPress REST API (content source only). A GitHub pipeline builds the app and publishes it to the linux-deploy branch, which linux3 pulls. Media stays on the WordPress server; the R2 bucket is used on staging only. Mail → TU/e's Microsoft mail through FluentSMTP on WordPress; the app's contact form still needs its mail connection. SEO and layout owned by Nuxt. The Cloudflare address remains as a preview.",
     "nodes": [
       {
         "id": "browser",
@@ -803,18 +919,18 @@
       },
       {
         "id": "pages",
-        "label": "Cloudflare — Nuxt static site",
-        "group": "cloudflare"
+        "label": "linux3 — Nuxt app (Plesk, Node.js)",
+        "group": "linux3"
       },
       {
         "id": "r2",
-        "label": "Cloudflare R2 — images & PDFs (one shared bucket)",
+        "label": "Cloudflare R2 — images & PDFs (staging only)",
         "group": "cloudflare"
       },
       {
         "id": "proxy",
         "label": "Nuxt server routes — /api/wp, /api/pdf, /api/contact, /api/site",
-        "group": "cloudflare"
+        "group": "linux3"
       },
       {
         "id": "wp",
@@ -823,18 +939,23 @@
       },
       {
         "id": "brevo",
-        "label": "Brevo or Microsoft Graph — transactional mail",
+        "label": "Mail service — TU/e Microsoft mail (or Brevo), to be connected",
         "group": "external"
       },
       {
         "id": "ci",
-        "label": "Manual merge of files (no pipeline)",
+        "label": "GitHub Actions — builds the app (linux → linux-deploy)",
         "group": "external"
       },
       {
         "id": "repo",
         "label": "Git repo (wp-content)",
         "group": "external"
+      },
+      {
+        "id": "plesk",
+        "label": "Plesk Git on linux3 — pulls linux-deploy",
+        "group": "linux3"
       }
     ],
     "edges": [
@@ -855,23 +976,43 @@
       },
       {
         "from": "browser",
-        "to": "r2",
-        "label": "media (R2 bucket)"
+        "to": "wp",
+        "label": "media (images and PDFs on the WordPress server)"
       },
       {
         "from": "proxy",
         "to": "brevo",
-        "label": "form submissions"
+        "label": "contact form (not connected yet)"
       },
       {
         "from": "repo",
+        "to": "wp",
+        "label": "files merged on the server, by hand"
+      },
+      {
+        "from": "wp",
         "to": "ci",
-        "label": "after the staging check"
+        "label": "Deploy Frontend button (GitHub API)"
       },
       {
         "from": "ci",
-        "to": "wp",
-        "label": "files merged on the server"
+        "to": "plesk",
+        "label": "publishes the finished build (linux-deploy)"
+      },
+      {
+        "from": "wp",
+        "to": "plesk",
+        "label": "calls Plesk's webhook on the same server"
+      },
+      {
+        "from": "plesk",
+        "to": "pages",
+        "label": "automatic deployment"
+      },
+      {
+        "from": "wp",
+        "to": "r2",
+        "label": "staging uploads only"
       }
     ]
   }
