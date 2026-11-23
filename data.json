@@ -769,7 +769,7 @@
       {
         "plugin": "regenerate-thumbnails",
         "purpose": "Rebuild image sizes",
-        "decision": "Deactivate",
+        "decision": "Deleted",
         "action": "The plugin is live and on staging.",
         "note": "Not necessary at this stage, could be usefull if theme is changed."
       },
